@@ -21,6 +21,7 @@ var clicked = false;
 
 var canvas = document.querySelector("#main_canvas");
 var circleMesh = [];
+var clicked = [false, false, false, false];
 var circleMeshRadius = 0.02;
 
 function init() {
@@ -89,7 +90,7 @@ function getXY(event) {
     return { x: x, y: y };
 }
 
-function isWithinCircle(event, circleID = 3) {
+function isWithinCircle(event, circleID) {
     var xy = getXY(event);
     // measure distance to the center of circle
     var d = Math.pow(
@@ -103,7 +104,16 @@ function isWithinCircle(event, circleID = 3) {
 }
 
 function onCanvasMouse(event) {
-    if(clicked) {
+    let isClicked = false;
+    let clickedId = 0;
+    for(let i = 0; i < 4; i++) {
+        if(clicked[i]) {
+            isClicked = true;
+            clickedId = i;
+        }
+    }
+    if(isClicked) {
+        // if clicked
         var xy = getXY(event);
         // do not go outside the bounderies
         if(xy.x < circleMeshRadius - 1) xy.x = circleMeshRadius - 1;
@@ -111,35 +121,54 @@ function onCanvasMouse(event) {
         if(xy.x > 1 - circleMeshRadius) xy.x = 1 - circleMeshRadius;
         if(xy.y > 1 - circleMeshRadius) xy.y = 1 - circleMeshRadius;
         // set position
-        circleMesh.position.x = xy.x;
-        circleMesh.position.y = xy.y;
+        circleMesh[clickedId].position.x = xy.x;
+        circleMesh[clickedId].position.y = xy.y;
     } else {
         // if mouse inside the circle
-        if(isWithinCircle(event)) {
-            canvas.style.cursor = 'pointer';
-            circleMesh[3].material.color.setHex(0x000fff);
-        } else {
-            canvas.style.cursor = 'default';
-            circleMesh[3].material.color.setHex(0xfff000);
+        let inCircle = false;
+        for(let i = 0; i < 4; i++) {
+            if(isWithinCircle(event, i)) {
+                circleMesh[i].material.color.setHex(0x000fff);
+                inCircle = true;
+            } else {
+                circleMesh[i].material.color.setHex(0xfff000);
+            }
         }
+        // pointer style
+        if(inCircle) canvas.style.cursor = 'pointer';
+        else canvas.style.cursor = 'default';
     }
     render();
 }
 
 function onCanvasClick(event) {
-    if(clicked) {
-        clicked = false;
+    let isClicked = false;
+    let clickedId = 0;
+    for(let i = 0; i < 4; i++) {
+        if(clicked[i]) {
+            isClicked = true;
+            clickedId = i;
+        }
+    }
+    if(isClicked) {
+        for(let i = 0; i < 4; i++) {
+            clicked[i] = false;
+        }
     } else {
-        if(isWithinCircle(event)) {
-            clicked = true;
+        for(let i = 0; i < 4; i++) {
+            if(isWithinCircle(event, i)) {
+                clicked[i] = true;
+            }
         }
     }
 }
 
 function onMouseLeave(event) {
-    clicked = false;
     canvas.style.cursor = 'default';
-    circleMesh.material.color.setHex(0xfff000);
+    for(let i = 0; i < 4; i++) {
+        clicked[i] = false;
+        circleMesh[i].material.color.setHex(0xfff000);
+    }
     render();
 }
 
