@@ -103,6 +103,15 @@ function isWithinCircle(event, circleID) {
     return false;
 }
 
+function applyConstraints(xy) {
+    // do not go outside the bounderies
+    if(xy.x < circleMeshRadius - 1) xy.x = circleMeshRadius - 1;
+    if(xy.y < circleMeshRadius - 1) xy.y = circleMeshRadius - 1;
+    if(xy.x > 1 - circleMeshRadius) xy.x = 1 - circleMeshRadius;
+    if(xy.y > 1 - circleMeshRadius) xy.y = 1 - circleMeshRadius;
+    return xy;
+}
+
 function onCanvasMouse(event) {
     let isClicked = false;
     let clickedId = 0;
@@ -115,11 +124,7 @@ function onCanvasMouse(event) {
     if(isClicked) {
         // if clicked
         var xy = getXY(event);
-        // do not go outside the bounderies
-        if(xy.x < circleMeshRadius - 1) xy.x = circleMeshRadius - 1;
-        if(xy.y < circleMeshRadius - 1) xy.y = circleMeshRadius - 1;
-        if(xy.x > 1 - circleMeshRadius) xy.x = 1 - circleMeshRadius;
-        if(xy.y > 1 - circleMeshRadius) xy.y = 1 - circleMeshRadius;
+        xy = applyConstraints(xy);
         // set position
         circleMesh[clickedId].position.x = xy.x;
         circleMesh[clickedId].position.y = xy.y;
