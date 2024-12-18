@@ -103,31 +103,62 @@ function isWithinCircle(event, circleID) {
     return false;
 }
 
-function applyConstraints(xy) {
+function applyConstraints(xy, circleID) {
     // do not go outside the bounderies
     if(xy.x < circleMeshRadius - 1) xy.x = circleMeshRadius - 1;
     if(xy.y < circleMeshRadius - 1) xy.y = circleMeshRadius - 1;
     if(xy.x > 1 - circleMeshRadius) xy.x = 1 - circleMeshRadius;
     if(xy.y > 1 - circleMeshRadius) xy.y = 1 - circleMeshRadius;
+    // do not intersect paths
+    /*
+    2   3
+    0   1
+    */
+    switch(circleID) {
+        case 0:
+            if(xy.x > (circleMesh[3].position.x - circleMeshRadius * 2)) 
+                xy.x = circleMesh[3].position.x - circleMeshRadius * 2;
+            if(xy.y > (circleMesh[3].position.y - circleMeshRadius * 2))
+                xy.y = circleMesh[3].position.y - circleMeshRadius * 2;
+            break;
+        case 1:
+            if(xy.x < (circleMesh[2].position.x + circleMeshRadius * 2)) 
+                xy.x = circleMesh[2].position.x + circleMeshRadius * 2;
+            if(xy.y > (circleMesh[2].position.y - circleMeshRadius * 2))
+                xy.y = circleMesh[2].position.y - circleMeshRadius * 2;
+            break;
+        case 2:
+            if(xy.x > (circleMesh[1].position.x - circleMeshRadius * 2)) 
+                xy.x = circleMesh[1].position.x - circleMeshRadius * 2;
+            if(xy.y < (circleMesh[1].position.y + circleMeshRadius * 2))
+                xy.y = circleMesh[1].position.y + circleMeshRadius * 2;
+            break;
+        case 3:
+            if(xy.x < (circleMesh[0].position.x + circleMeshRadius * 2)) 
+                xy.x = circleMesh[0].position.x + circleMeshRadius * 2;
+            if(xy.y < (circleMesh[0].position.y + circleMeshRadius * 2))
+                xy.y = circleMesh[0].position.y + circleMeshRadius * 2;
+            break;
+    }
     return xy;
 }
 
 function onCanvasMouse(event) {
     let isClicked = false;
-    let clickedId = 0;
+    let circleID = 0;
     for(let i = 0; i < 4; i++) {
         if(clicked[i]) {
             isClicked = true;
-            clickedId = i;
+            circleID = i;
         }
     }
     if(isClicked) {
         // if clicked
         var xy = getXY(event);
-        xy = applyConstraints(xy);
+        xy = applyConstraints(xy, circleID);
         // set position
-        circleMesh[clickedId].position.x = xy.x;
-        circleMesh[clickedId].position.y = xy.y;
+        circleMesh[circleID].position.x = xy.x;
+        circleMesh[circleID].position.y = xy.y;
     } else {
         // if mouse inside the circle
         let inCircle = false;
