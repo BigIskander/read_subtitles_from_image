@@ -159,6 +159,29 @@ function onCanvasMouse(event) {
         // set position
         circleMesh[circleID].position.x = xy.x;
         circleMesh[circleID].position.y = xy.y;
+        // adjust adjacent elements position
+        /*
+        2   3
+        0   1
+        */
+        switch(circleID) {
+            case 0:
+                circleMesh[2].position.x = xy.x;
+                circleMesh[1].position.y = xy.y;
+                break;
+            case 1:
+                circleMesh[3].position.x = xy.x;
+                circleMesh[0].position.y = xy.y;
+                break;
+            case 2:
+                circleMesh[0].position.x = xy.x;
+                circleMesh[3].position.y = xy.y;
+                break;
+            case 3:
+                circleMesh[1].position.x = xy.x;
+                circleMesh[2].position.y = xy.y;
+                break;
+        }
     } else {
         // if mouse inside the circle
         let inCircle = false;
