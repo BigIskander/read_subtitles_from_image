@@ -259,7 +259,15 @@ function render(postponed = false) {
     //console.log(16 - deltaTime * 1000);//
 }
 
+function pasteAnImage() {
+    alert("okk");
+}
+
 init();
+
+export {
+    pasteAnImage
+}
 
 // dinamic line geometry example
 // https://codesandbox.io/p/sandbox/threejs-basic-example-forked-ygjt9o?file=%2Fsrc%2Findex.js%3A5%2C22

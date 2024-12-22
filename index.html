@@ -26,11 +26,20 @@
         }
       }
     </script>
+    <script type="text/JavaScript">
+      var pasteAnImage;
+    </script>
+    <script type="module" defer>
+      (async () => {
+        var main = await import("./index.js");
+        pasteAnImage = main.pasteAnImage;
+      })();
+    </script>
   </head>
   <body>
+    <div><a href="JavaScript:void(0);" onclick="pasteAnImage();">test</a></div>
     <div id="canvas_container">
       <canvas width="800" height="800" id="main_canvas"></canvas>
     </div>
-    <script type="module" src="index.js"></script>
   </body>
 </html>
