@@ -114,31 +114,19 @@ function applyConstraints(xy, circleID) {
     2   3
     0   1
     */
-    switch(circleID) {
-        case 0:
-            if(xy.x > (circleMesh[3].position.x - circleMeshRadius * 2)) 
-                xy.x = circleMesh[3].position.x - circleMeshRadius * 2;
-            if(xy.y > (circleMesh[3].position.y - circleMeshRadius * 2))
-                xy.y = circleMesh[3].position.y - circleMeshRadius * 2;
-            break;
-        case 1:
-            if(xy.x < (circleMesh[2].position.x + circleMeshRadius * 2)) 
-                xy.x = circleMesh[2].position.x + circleMeshRadius * 2;
-            if(xy.y > (circleMesh[2].position.y - circleMeshRadius * 2))
-                xy.y = circleMesh[2].position.y - circleMeshRadius * 2;
-            break;
-        case 2:
-            if(xy.x > (circleMesh[1].position.x - circleMeshRadius * 2)) 
-                xy.x = circleMesh[1].position.x - circleMeshRadius * 2;
-            if(xy.y < (circleMesh[1].position.y + circleMeshRadius * 2))
-                xy.y = circleMesh[1].position.y + circleMeshRadius * 2;
-            break;
-        case 3:
-            if(xy.x < (circleMesh[0].position.x + circleMeshRadius * 2)) 
-                xy.x = circleMesh[0].position.x + circleMeshRadius * 2;
-            if(xy.y < (circleMesh[0].position.y + circleMeshRadius * 2))
-                xy.y = circleMesh[0].position.y + circleMeshRadius * 2;
-            break;
+    if(Math.floor(circleID / 2) == 0) { 
+        if(xy.y > circleMesh[2].position.y - circleMeshRadius *2)
+            xy.y = circleMesh[2].position.y - circleMeshRadius * 2;
+    } else {
+        if(xy.y < circleMesh[0].position.y + circleMeshRadius * 2)
+            xy.y = circleMesh[0].position.y + circleMeshRadius * 2;
+    }
+    if(circleID % 2 == 0) {
+        if(xy.x > circleMesh[3].position.x - circleMeshRadius * 2)
+            xy.x = circleMesh[3].position.x - circleMeshRadius * 2;
+    } else {
+        if(xy.x < circleMesh[2].position.x + circleMeshRadius * 2)
+            xy.x = circleMesh[2].position.x + circleMeshRadius * 2;
     }
     return xy;
 }
@@ -164,23 +152,12 @@ function onCanvasMouse(event) {
         2   3
         0   1
         */
-        switch(circleID) {
-            case 0:
-                circleMesh[2].position.x = xy.x;
-                circleMesh[1].position.y = xy.y;
-                break;
-            case 1:
-                circleMesh[3].position.x = xy.x;
-                circleMesh[0].position.y = xy.y;
-                break;
-            case 2:
-                circleMesh[0].position.x = xy.x;
-                circleMesh[3].position.y = xy.y;
-                break;
-            case 3:
-                circleMesh[1].position.x = xy.x;
-                circleMesh[2].position.y = xy.y;
-                break;
+        if(Math.floor(circleID / 2) == 0) {
+            circleMesh[2 + circleID % 2].position.x = xy.x;
+            circleMesh[1 - circleID % 2].position.y = xy.y;      
+        } else {
+            circleMesh[0 + circleID % 2].position.x = xy.x;
+            circleMesh[3 - circleID % 2].position.y = xy.y;
         }
     } else {
         // if mouse inside the circle
