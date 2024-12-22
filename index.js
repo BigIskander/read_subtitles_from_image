@@ -1,4 +1,7 @@
 import * as THREE from 'three';
+import { Line2 } from 'jsm/lines/Line2.js';
+import { LineMaterial } from 'jsm/lines/LineMaterial.js';
+import { LineGeometry } from 'jsm/lines/LineGeometry.js';
 
 var camera, scene, renderer; //, clock;
 var clicked = false;
@@ -25,6 +28,9 @@ var clicked = [false, false, false, false];
 var circleMeshRadius = 0.03;
 var circleMeshColor = 0x000000;
 var circleMeshColorHighlight = 0x00ccff;
+var buffer;
+var cutGeometry;
+var cutLineColor = 0xff0000;
 
 function init() {
     camera = new THREE.Camera();
@@ -56,6 +62,24 @@ function init() {
         circleMesh[i].position.y += -0.1 + Math.floor(i / 2) * 0.2;
         scene.add(circleMesh[i]);
     }
+    /*
+    2   3
+    0   1
+    */
+    // Cutting line
+    buffer = ([
+        //x    y    z
+        -0.1, -0.1, 0.0, // 0
+         0.1, -0.1, 0.0, // 1
+         0.1,  0.1, 0.0, // 3
+        -0.1,  0.1, 0.0, // 2
+        -0.1, -0.1, 0.0  // 0
+    ]);
+    var cutGeometryMaterial = new LineMaterial({ color: cutLineColor });
+    cutGeometry = new LineGeometry();
+    cutGeometry.setPositions(buffer); // this one
+    const cutLine = new Line2(cutGeometry, cutGeometryMaterial);
+    scene.add(cutLine);
 
     canvas.addEventListener("mousemove", onCanvasMouse);
     canvas.addEventListener("click", onCanvasClick);
@@ -164,6 +188,16 @@ function onCanvasMouse(event) {
             circleMesh[0 + circleID % 2].position.x = xy.x;
             circleMesh[3 - circleID % 2].position.y = xy.y;
         }
+        // adjust the line
+        buffer = ([
+            //x    y    z
+            circleMesh[0].position.x, circleMesh[0].position.y, 0.0, // 0
+            circleMesh[1].position.x, circleMesh[1].position.y, 0.0, // 1
+            circleMesh[3].position.x, circleMesh[3].position.y, 0.0, // 3
+            circleMesh[2].position.x, circleMesh[2].position.y, 0.0, // 2
+            circleMesh[0].position.x, circleMesh[0].position.y, 0.0, // 0
+        ]);
+        cutGeometry.setPositions(buffer);
     } else {
         // if mouse inside the circle
         let inCircle = false;
@@ -214,3 +248,7 @@ function render() {
 }
 
 init();
+
+// dinamic line geometry example
+// https://codesandbox.io/p/sandbox/threejs-basic-example-forked-ygjt9o?file=%2Fsrc%2Findex.js%3A5%2C22
+// https://discourse.threejs.org/t/how-to-update-line2-dynamically/37913/4
