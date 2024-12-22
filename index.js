@@ -179,12 +179,8 @@ function onCanvasMouse(event) {
 
 function onCanvasClick(event) {
     let isClicked = false;
-    let clickedId = 0;
     for(let i = 0; i < 4; i++) {
-        if(clicked[i]) {
-            isClicked = true;
-            clickedId = i;
-        }
+        if(clicked[i]) isClicked = true;
     }
     if(isClicked) {
         for(let i = 0; i < 4; i++) {
@@ -192,9 +188,7 @@ function onCanvasClick(event) {
         }
     } else {
         for(let i = 0; i < 4; i++) {
-            if(isWithinCircle(event, i)) {
-                clicked[i] = true;
-            }
+            if(isWithinCircle(event, i)) clicked[i] = true;
         }
     }
 }
