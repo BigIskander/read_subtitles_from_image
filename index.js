@@ -22,7 +22,9 @@ var clicked = false;
 var canvas = document.querySelector("#main_canvas");
 var circleMesh = [];
 var clicked = [false, false, false, false];
-var circleMeshRadius = 0.02;
+var circleMeshRadius = 0.03;
+var circleMeshColor = 0x000000;
+var circleMeshColorHighlight = 0x00ccff;
 
 function init() {
     camera = new THREE.Camera();
@@ -32,7 +34,7 @@ function init() {
     // clock = new THREE.Clock();
 
     var geometry = new THREE.PlaneGeometry(2, 2);
-    var circle = new THREE.CircleGeometry(circleMeshRadius);
+    var circle = new THREE.RingGeometry(circleMeshRadius - 0.005, circleMeshRadius, 32);
 
     // uniforms = {
     //     u_time: { type: "f", value: 1.0 },
@@ -49,7 +51,7 @@ function init() {
     var mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: 0xcccccc }));
     scene.add(mesh);
     for(let i = 0; i < 4; i++) {
-        circleMesh[i] = new THREE.Mesh(circle, new THREE.MeshBasicMaterial({ color: 0xfff000 }));
+        circleMesh[i] = new THREE.Mesh(circle, new THREE.MeshBasicMaterial({ color: circleMeshColor }));
         circleMesh[i].position.x += -0.1 + (i % 2) * 0.2;
         circleMesh[i].position.y += -0.1 + Math.floor(i / 2) * 0.2;
         scene.add(circleMesh[i]);
@@ -167,10 +169,10 @@ function onCanvasMouse(event) {
         let inCircle = false;
         for(let i = 0; i < 4; i++) {
             if(isWithinCircle(event, i)) {
-                circleMesh[i].material.color.setHex(0x000fff);
+                circleMesh[i].material.color.setHex(circleMeshColorHighlight);
                 inCircle = true;
             } else {
-                circleMesh[i].material.color.setHex(0xfff000);
+                circleMesh[i].material.color.setHex(circleMeshColor);
             }
         }
         // pointer style
@@ -200,7 +202,7 @@ function onMouseLeave(event) {
     canvas.style.cursor = 'default';
     for(let i = 0; i < 4; i++) {
         clicked[i] = false;
-        circleMesh[i].material.color.setHex(0xfff000);
+        circleMesh[i].material.color.setHex(circleMeshColor);
     }
     render();
 }
