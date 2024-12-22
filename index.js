@@ -84,8 +84,11 @@ function init() {
 // }
 
 function getXY(event) {
-    var x = (event.pageX / canvas.width) * 2.0 - 1.0;
-    var y = (event.pageY / canvas.height) * 2.0 - 1.0;
+    var bBox = canvas.getBoundingClientRect();
+    var xc = bBox.left;
+    var yc = bBox.top;
+    var x = ((event.pageX - xc) / canvas.width) * 2.0 - 1.0;
+    var y = ((event.pageY - yc) / canvas.height) * 2.0 - 1.0;
     y *= -1; // flip y
     return { x: x, y: y };
 }
