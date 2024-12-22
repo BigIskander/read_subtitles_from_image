@@ -3,7 +3,7 @@ import { Line2 } from 'jsm/lines/Line2.js';
 import { LineMaterial } from 'jsm/lines/LineMaterial.js';
 import { LineGeometry } from 'jsm/lines/LineGeometry.js';
 
-var camera, scene, renderer; //, clock;
+var camera, scene, renderer, clock;
 var clicked = false;
 // var uniforms;
 
@@ -31,13 +31,16 @@ var circleMeshColorHighlight = 0x00ccff;
 var buffer;
 var cutGeometry;
 var cutLineColor = 0xff0000;
+// optimization
+var postponedFrame = false;
+var frameTime = 0.016; // in seconds (0.016 ~ 60FPS; 0.032 ~ 30FPS)
 
 function init() {
     camera = new THREE.Camera();
     camera.position.z = 1;
 
     scene = new THREE.Scene();
-    // clock = new THREE.Clock();
+    clock = new THREE.Clock();
 
     var geometry = new THREE.PlaneGeometry(2, 2);
     var circle = new THREE.RingGeometry(circleMeshRadius - 0.005, circleMeshRadius, 32);
@@ -241,10 +244,19 @@ function onMouseLeave(event) {
     render();
 }
 
-function render() {
+function render(postponed = false) {
     // uniforms.u_time.value += clock.getDelta();
+    var deltaTime = clock.getDelta();
     // circleMesh.position.x = 1;
-    renderer.render( scene, camera );
+    if(!postponed && postponedFrame) return;
+    if(deltaTime > frameTime || postponed) {
+        postponedFrame = false;
+        renderer.render(scene, camera);
+    } else {
+        postponedFrame = true;
+        setTimeout(() => { render(true); }, (frameTime - deltaTime) * 1000);
+    }
+    //console.log(16 - deltaTime * 1000);//
 }
 
 init();
