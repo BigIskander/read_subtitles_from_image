@@ -259,7 +259,24 @@ function render(postponed = false) {
     //console.log(16 - deltaTime * 1000);//
 }
 
-function pasteAnImage() {
+// clipboard read
+// https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/read
+async function pasteAnImage() {
+    try {
+        const clipboardContents = await navigator.clipboard.read();
+        for (const item of clipboardContents) {
+            // check if it is an image
+            if (item.types.includes("image/png")) {
+                console.log("image");
+                const blob = await item.getType("image/png");
+                const testImage = document.querySelector("#test_image");
+                testImage.src = URL.createObjectURL(blob);
+            }
+        }
+        console.log(clipboardContents);
+    } catch (error) {
+        log(error.message);
+    }
     alert("okk");
 }
 
