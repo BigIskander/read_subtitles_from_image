@@ -23,10 +23,12 @@ var clicked = false;
 // var fragmentShader = await load_shader("/shader.frag");
 
 var canvas = document.querySelector("#main_canvas");
+var mesh;
+var meshTexture;
 var circleMesh = [];
 var clicked = [false, false, false, false];
 var circleMeshRadius = 0.03;
-var circleMeshColor = 0x000000;
+var circleMeshColor = 0xffffff;
 var circleMeshColorHighlight = 0x00ccff;
 var buffer;
 var cutGeometry;
@@ -56,8 +58,9 @@ function init() {
     //     vertexShader: vertexShader,
     //     fragmentShader: fragmentShader
     // });
-
-    var mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: 0xcccccc }));
+    
+    meshTexture = new THREE.Texture();
+    mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: 0xcccccc, map: meshTexture }));
     scene.add(mesh);
     for(let i = 0; i < 4; i++) {
         circleMesh[i] = new THREE.Mesh(circle, new THREE.MeshBasicMaterial({ color: circleMeshColor }));
@@ -259,8 +262,6 @@ function render(postponed = false) {
     //console.log(16 - deltaTime * 1000);//
 }
 
-// clipboard read
-// https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/read
 async function pasteAnImage() {
     try {
         const clipboardContents = await navigator.clipboard.read();
@@ -269,13 +270,22 @@ async function pasteAnImage() {
             if (item.types.includes("image/png")) {
                 console.log("image");
                 const blob = await item.getType("image/png");
-                const testImage = document.querySelector("#test_image");
-                testImage.src = URL.createObjectURL(blob);
+                var image = new Image();
+                // const testImage = document.querySelector("#test_image");
+                image.src = URL.createObjectURL(blob);
+                image.onload = function() { 
+                    meshTexture.image = image; 
+                    meshTexture.needsUpdate = true;
+                    render();
+                    console.log(image); 
+                };
+                // meshTexture.image = testImage;
+                // meshTexture.needsUpdate = true;
             }
         }
         console.log(clipboardContents);
     } catch (error) {
-        log(error.message);
+        console.log(error.message);
     }
     alert("okk");
 }
@@ -289,3 +299,8 @@ export {
 // dinamic line geometry example
 // https://codesandbox.io/p/sandbox/threejs-basic-example-forked-ygjt9o?file=%2Fsrc%2Findex.js%3A5%2C22
 // https://discourse.threejs.org/t/how-to-update-line2-dynamically/37913/4
+
+// clipboard read
+// https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/read
+// use blob image as texture
+// https://stackoverflow.com/questions/41738664/is-it-possible-to-construct-a-three-texture-from-byte-array-rather-than-file-pat
