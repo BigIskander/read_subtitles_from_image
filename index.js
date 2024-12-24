@@ -274,6 +274,7 @@ async function pasteAnImage() {
                 // const testImage = document.querySelector("#test_image");
                 image.src = URL.createObjectURL(blob);
                 image.onload = function() { 
+                    meshTexture.dispose();
                     meshTexture.image = image; 
                     meshTexture.needsUpdate = true;
                     render();
