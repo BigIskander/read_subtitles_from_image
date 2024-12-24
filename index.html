@@ -75,7 +75,7 @@
   <body>
     <div id="top_buttons">
       <a href="JavaScript:void(0);" onclick="pasteAnImage();">Paste an image from clipboard.</a> ||
-      <a href="JavaScript:void(0);" onclick="openAnImage();">Open image file.</a> ||
+      Open image file: <input type="file" onchange="openAnImage(event);"> ||
       <a href="JavaScript:void(0);" onclick="clearCanvas();">Clear.</a>
     </div>
     <div id="canvas_container">

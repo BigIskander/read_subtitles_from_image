@@ -267,6 +267,35 @@ function render(postponed = false) {
     //console.log(16 - deltaTime * 1000);//
 }
 
+function updateImage(image) {
+    // testImage.src = image.src;
+    var aspectRatio = image.width / image.height;
+    if(image.width > image.height) {
+        var width = 2 - circleMeshRadius * 2;
+        var height = width / aspectRatio;
+    } else {
+        var height = 2 - circleMeshRadius * 2;
+        var width = height * aspectRatio;
+    }
+    mesh.geometry.dispose();
+    var geometry = new THREE.PlaneGeometry(width, height);
+    mesh.geometry = geometry;
+    // geometry.parameters.height = 2 - circleMeshRadius * 2;
+    // geometry.parameters.width = geometry.parameters.height * aspectRatio;
+    // geometry.needsUpdate = true;
+    console.log(mesh);
+    console.log(aspectRatio);
+    meshTexture.dispose();
+    meshTexture.colorSpace = THREE.SRGBColorSpace;
+    meshTexture.generateMipmaps = false;
+    meshTexture.minFilter = THREE.LinearFilter;
+    meshTexture.image = image; 
+    console.log(meshTexture);
+    meshTexture.needsUpdate = true;
+    render();
+    console.log(image); 
+}
+
 async function pasteAnImage() {
     try {
         const clipboardContents = await navigator.clipboard.read();
@@ -277,35 +306,10 @@ async function pasteAnImage() {
                 const blob = await item.getType("image/png");
                 var image = new Image();
                 // const testImage = document.querySelector("#test_image");
-                image.src = URL.createObjectURL(blob);
                 image.onload = function() {
-                    // testImage.src = image.src;
-                    var aspectRatio = image.width / image.height;
-                    if(image.width > image.height) {
-                        var width = 2 - circleMeshRadius * 2;
-                        var height = width / aspectRatio;
-                    } else {
-                        var height = 2 - circleMeshRadius * 2;
-                        var width = height * aspectRatio;
-                    }
-                    mesh.geometry.dispose();
-                    var geometry = new THREE.PlaneGeometry(width, height);
-                    mesh.geometry = geometry;
-                    // geometry.parameters.height = 2 - circleMeshRadius * 2;
-                    // geometry.parameters.width = geometry.parameters.height * aspectRatio;
-                    // geometry.needsUpdate = true;
-                    console.log(mesh);
-                    console.log(aspectRatio);
-                    meshTexture.dispose();
-                    meshTexture.colorSpace = THREE.SRGBColorSpace;
-                    meshTexture.generateMipmaps = false;
-                    meshTexture.minFilter = THREE.LinearFilter;
-                    meshTexture.image = image; 
-                    console.log(meshTexture);
-                    meshTexture.needsUpdate = true;
-                    render();
-                    console.log(image); 
+                    updateImage(image);
                 };
+                image.src = URL.createObjectURL(blob);
                 // meshTexture.image = testImage;
                 // meshTexture.needsUpdate = true;
             } else {
@@ -314,12 +318,34 @@ async function pasteAnImage() {
         }
         console.log(clipboardContents);
     } catch (error) {
+        alert(error.message);
         console.log(error.message);
     }
 }
 
-async function openAnImage() {
-    alert("Open image file...");
+async function openAnImage(event) {
+    console.log(event);
+    if(event.target.files.length < 1) return;
+    var imageFile = event.target.files[0];
+    var supportedFileTypes = [
+                'image/apng', 'image/avif', 'image/gif', 'image/jpeg', 
+                'image/png', 'image/svg+xml',
+                'image/webp', 'image/bmp', 'image/x-icon', 'image/tiff'
+    ];
+    if (!supportedFileTypes.includes(imageFile['type'])) {
+        alert("Not an image.");
+        return;
+    }
+    // if it is an image
+    var filerdr = new FileReader();
+    filerdr.onload = function(e) {
+        var image = new Image();
+        image.onload = function() {
+            updateImage(image);
+        }
+        image.src = e.target.result;
+    }
+    filerdr.readAsDataURL(imageFile);
 }
 
 async function clearCanvas() {
