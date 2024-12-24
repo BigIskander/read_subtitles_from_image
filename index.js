@@ -349,7 +349,14 @@ async function openAnImage(event) {
 }
 
 async function clearCanvas() {
-    alert("Clear the canvas...");
+    if(confirm("Clear?")) {
+        mesh.geometry.dispose();
+        var geometry = new THREE.PlaneGeometry(0, 0);
+        mesh.geometry = geometry;
+        meshTexture.dispose();
+        meshTexture.needsUpdate = true;
+        render();
+    }
 }
 
 async function recognizeText() {
