@@ -23,28 +23,32 @@ var clicked = false;
 // var fragmentShader = await load_shader("/shader.frag");
 
 var canvas = document.querySelector("#main_canvas");
+var canvasWidth = 800; // in pixels
+var canvasHeight = 800; // in pixels
+var clearColor = 0x333333;
 var mesh;
 var meshTexture;
 var circleMesh = [];
 var clicked = [false, false, false, false];
 var circleMeshRadius = 0.03;
 var circleMeshColor = 0xffffff;
-var circleMeshColorHighlight = 0x00ccff;
+var circleMeshColorHighlight = 0x00ffff;
 var buffer;
 var cutGeometry;
 var cutLineColor = 0xff0000;
+var cutLineWidth = 7;
 // optimization
 var postponedFrame = false;
-var frameTime = 0.016; // in seconds (0.016 ~ 60FPS; 0.032 ~ 30FPS)
+var frameTime = 0.032; // in seconds (0.016 ~ 60FPS; 0.032 ~ 30FPS)
 
 function init() {
     camera = new THREE.Camera();
-    camera.position.z = 1;
+    camera.position.z = 0.001;
 
     scene = new THREE.Scene();
     clock = new THREE.Clock();
 
-    var geometry = new THREE.PlaneGeometry(2, 2);
+    var geometry = new THREE.PlaneGeometry(0, 0);
     var circle = new THREE.RingGeometry(circleMeshRadius - 0.005, circleMeshRadius, 32);
 
     // uniforms = {
@@ -60,7 +64,7 @@ function init() {
     // });
     
     meshTexture = new THREE.Texture();
-    mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: 0xcccccc, map: meshTexture }));
+    mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ map: meshTexture }));
     scene.add(mesh);
     for(let i = 0; i < 4; i++) {
         circleMesh[i] = new THREE.Mesh(circle, new THREE.MeshBasicMaterial({ color: circleMeshColor }));
@@ -81,7 +85,7 @@ function init() {
         -0.1,  0.1, 0.0, // 2
         -0.1, -0.1, 0.0  // 0
     ]);
-    var cutGeometryMaterial = new LineMaterial({ color: cutLineColor });
+    var cutGeometryMaterial = new LineMaterial({ color: cutLineColor, linewidth: cutLineWidth });
     cutGeometry = new LineGeometry();
     cutGeometry.setPositions(buffer); // this one
     const cutLine = new Line2(cutGeometry, cutGeometryMaterial);
@@ -95,7 +99,8 @@ function init() {
         antialias: true,
         canvas: canvas
     });
-    renderer.setPixelRatio( window.devicePixelRatio );
+    renderer.setClearColor(clearColor);
+    renderer.setPixelRatio(window.devicePixelRatio);
 
     // onWindowResize();
     // window.addEventListener('resize', onWindowResize, false);
@@ -117,10 +122,10 @@ function init() {
 
 function getXY(event) {
     var bBox = canvas.getBoundingClientRect();
-    var xc = bBox.left;
-    var yc = bBox.top;
-    var x = ((event.pageX - xc) / canvas.width) * 2.0 - 1.0;
-    var y = ((event.pageY - yc) / canvas.height) * 2.0 - 1.0;
+    var xc = bBox.left + window.scrollX;
+    var yc = bBox.top + window.scrollY;
+    var x = ((event.pageX - xc) / canvasWidth) * 2.0 - 1.0;
+    var y = ((event.pageY - yc) / canvasHeight) * 2.0 - 1.0;
     y *= -1; // flip y
     return { x: x, y: y };
 }
@@ -273,9 +278,29 @@ async function pasteAnImage() {
                 var image = new Image();
                 // const testImage = document.querySelector("#test_image");
                 image.src = URL.createObjectURL(blob);
-                image.onload = function() { 
+                image.onload = function() {
+                    // testImage.src = image.src;
+                    var aspectRatio = image.width / image.height;
+                    if(image.width > image.height) {
+                        var width = 2 - circleMeshRadius * 2;
+                        var height = width / aspectRatio;
+                    } else {
+                        var height = 2 - circleMeshRadius * 2;
+                        var width = height * aspectRatio;
+                    }
+                    mesh.geometry.dispose();
+                    var geometry = new THREE.PlaneGeometry(width, height);
+                    mesh.geometry = geometry;
+                    // geometry.parameters.height = 2 - circleMeshRadius * 2;
+                    // geometry.parameters.width = geometry.parameters.height * aspectRatio;
+                    // geometry.needsUpdate = true;
+                    console.log(mesh);
+                    console.log(aspectRatio);
                     meshTexture.dispose();
+                    meshTexture.generateMipmaps = false;
+                    meshTexture.minFilter = THREE.LinearFilter;
                     meshTexture.image = image; 
+                    console.log(meshTexture);
                     meshTexture.needsUpdate = true;
                     render();
                     console.log(image); 
