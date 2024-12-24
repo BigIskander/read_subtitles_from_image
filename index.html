@@ -8,15 +8,44 @@
       body {
         margin: 0;
       }
-      #canvas_container {
-        margin-top: 2%;
-        margin-bottom: 2%;
+      #top_buttons {
+        /* background-color: red; */
+        margin-top: 1%;
+        margin-bottom: 5px;
         margin-left: 2%;
         margin-right: 2%;
+      }
+      #canvas_container {
+        /* background-color: blue; */
+        margin-top: 5px;
+        margin-bottom: 5px;
+        margin-left: 2%;
+        margin-right: 2%;
+        padding-left: 0px;
+        padding-right: 0px;
+        padding-top: 0px;
+        padding-bottom: 0px;
+        border-width: 0px;
       }
       #main_canvas {
         width: 1024px;
         height: 1024px;
+        margin-top: 0px;
+        margin-bottom: 0px;
+        margin-left: 0px;
+        margin-right: 0px;
+        padding-left: 0px;
+        padding-right: 0px;
+        padding-top: 0px;
+        padding-bottom: 0px;
+        border-width: 0px;
+      }
+      #bottom_buttons {
+        /* background-color: red; */
+        margin-top: 5px;
+        margin-bottom: 5px;
+        margin-left: 2%;
+        margin-right: 2%;
       }
     </style>
     <script type="importmap">
@@ -29,18 +58,31 @@
     </script>
     <script type="text/JavaScript">
       var pasteAnImage;
+      var openAnImage;
+      var clearCanvas;
+      var recognizeText;
     </script>
     <script type="module" defer>
       (async () => {
         var main = await import("./index.js");
         pasteAnImage = main.pasteAnImage;
+        openAnImage = main.openAnImage;
+        clearCanvas = main.clearCanvas;
+        recognizeText = main.recognizeText;
       })();
     </script>
   </head>
   <body>
-    <div><a href="JavaScript:void(0);" onclick="pasteAnImage();">test</a></div>
+    <div id="top_buttons">
+      <a href="JavaScript:void(0);" onclick="pasteAnImage();">Paste an image from clipboard.</a> ||
+      <a href="JavaScript:void(0);" onclick="openAnImage();">Open image file.</a> ||
+      <a href="JavaScript:void(0);" onclick="clearCanvas();">Clear.</a>
+    </div>
     <div id="canvas_container">
       <canvas width="4096" height="4096" id="main_canvas"></canvas>
+    </div>
+    <div id="bottom_buttons">
+      <a href="JavaScript:void(0);" onclick="recognizeText();">Recognize selected text.</a>
     </div>
     <div>
       <img id="test_image" />

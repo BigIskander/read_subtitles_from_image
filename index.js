@@ -308,19 +308,35 @@ async function pasteAnImage() {
                 };
                 // meshTexture.image = testImage;
                 // meshTexture.needsUpdate = true;
+            } else {
+                alert("Not an image.");
             }
         }
         console.log(clipboardContents);
     } catch (error) {
         console.log(error.message);
     }
-    alert("okk");
+}
+
+async function openAnImage() {
+    alert("Open image file...");
+}
+
+async function clearCanvas() {
+    alert("Clear the canvas...");
+}
+
+async function recognizeText() {
+    alert("Recognize text from an image");
 }
 
 init();
 
 export {
-    pasteAnImage
+    pasteAnImage,
+    openAnImage,
+    clearCanvas,
+    recognizeText
 }
 
 // dinamic line geometry example
