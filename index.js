@@ -23,15 +23,15 @@ var clicked = false;
 // var fragmentShader = await load_shader("/shader.frag");
 
 var canvas = document.querySelector("#main_canvas");
-var canvasWidth = 800; // in pixels
-var canvasHeight = 800; // in pixels
+var canvasWidth = parseInt(window.getComputedStyle(canvas).width); // in pixels
+var canvasHeight = parseInt(window.getComputedStyle(canvas).height); // in pixels
 var clearColor = 0x333333;
 var mesh;
 var meshTexture;
 var circleMesh = [];
 var clicked = [false, false, false, false];
 var circleMeshRadius = 0.03;
-var circleMeshColor = 0xffffff;
+var circleMeshColor = 0xff00ff;
 var circleMeshColorHighlight = 0x00ffff;
 var buffer;
 var cutGeometry;
@@ -297,6 +297,7 @@ async function pasteAnImage() {
                     console.log(mesh);
                     console.log(aspectRatio);
                     meshTexture.dispose();
+                    meshTexture.colorSpace = THREE.SRGBColorSpace;
                     meshTexture.generateMipmaps = false;
                     meshTexture.minFilter = THREE.LinearFilter;
                     meshTexture.image = image; 
