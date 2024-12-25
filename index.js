@@ -43,7 +43,7 @@ var postponedFrame = false;
 var frameTime = 0.032; // in seconds (0.016 ~ 60FPS; 0.032 ~ 30FPS)
 // color picker mode
 var isColorPicker = false;
-var colorPicker = document.querySelector("#color_picker");
+var colorPicker = document.querySelector("#subtitles_color");
 
 function init() {
     camera = new THREE.Camera();
@@ -204,8 +204,13 @@ function onCanvasMouse(event) {
         if(gscale < 128) var textColor = [255, 255, 255, 255];
         else var textColor = [0, 0, 0, 255];
         colorPicker.style.color = "rgba(" + textColor.join(", ") + ")";
-        colorPicker.innerHTML = "rgba(" + color.join(", ") + ")";
-        console.log(color);
+        var colorMp = (value) => { 
+            if(value < 10) return "&nbsp;&nbsp" + value;
+            if(value < 100) return "&nbsp" + value;
+            return "" + value;
+        }
+        colorPicker.innerHTML = "rgba(" + [...color].map(colorMp).join(", ") + ")";
+        // console.log(color);
         return;
     }
     // usual mode
