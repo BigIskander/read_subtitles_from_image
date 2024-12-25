@@ -3,7 +3,7 @@ import { Line2 } from 'jsm/lines/Line2.js';
 import { LineMaterial } from 'jsm/lines/LineMaterial.js';
 import { LineGeometry } from 'jsm/lines/LineGeometry.js';
 
-var camera, scene, renderer, clock;
+var camera, scene, renderer, clock, renderTarget, sceneRTT;
 var clicked = false;
 // var uniforms;
 
@@ -27,6 +27,7 @@ var canvasWidth = parseInt(window.getComputedStyle(canvas).width); // in pixels
 var canvasHeight = parseInt(window.getComputedStyle(canvas).height); // in pixels
 var clearColor = 0x333333;
 var mesh;
+var meshRTT;
 var meshTexture;
 var circleMesh = [];
 var clicked = [false, false, false, false];
@@ -97,6 +98,16 @@ function init() {
     canvas.addEventListener("mousemove", onCanvasMouse);
     canvas.addEventListener("click", onCanvasClick);
     canvas.addEventListener("mouseleave", onMouseLeave);
+
+    renderTarget = new THREE.WebGLRenderTarget(canvas.width, canvas.height, { 
+        minFilter: THREE.LinearFilter, 
+        magFilter: THREE.NearestFilter, 
+        format: THREE.RGBAFormat, 
+        type: THREE.FloatType
+    });
+    sceneRTT = new THREE.Scene();
+    meshRTT = mesh.clone();
+    sceneRTT.add(meshRTT);
 
     renderer = new THREE.WebGLRenderer({
         antialias: true,
@@ -178,7 +189,23 @@ function onCanvasMouse(event) {
     // color picker mode
     if(isColorPicker)
     {
-
+        var xy = getXY(event);
+        // convert from relative to pixel coordinates
+        xy.x = parseInt(canvas.width * ((1.0 + xy.x) / 2.0));
+        xy.y = parseInt(canvas.height * ((1.0 + xy.y) / 2.0));
+        // console.log(xy)
+        // read color of a pixel
+        var color = new Float32Array(4);
+        renderer.readRenderTargetPixels(renderTarget, xy.x, xy.y, 1, 1, color);
+        // transform from 0 - 1 to 0 - 255
+        color.forEach((value, index, arr) => { arr[index] = parseInt(value * 255); });
+        colorPicker.style.backgroundColor = "rgba(" + color.join(", ") + ")";
+        var color2 = [...color];
+        color2.forEach((value, index, arr) => { if(index < 3) arr[index] = 255 - value; });
+        colorPicker.style.color = "rgba(" + color2.join(", ") + ")";
+        colorPicker.innerHTML = "rgba(" + color.join(", ") + ")";
+        console.log(color);
+        console.log(color2);
         return;
     }
     // usual mode
@@ -242,7 +269,6 @@ function onCanvasClick(event) {
     if(isColorPicker) {
         isColorPicker = false;
         canvas.style.cursor = 'default';
-        colorPicker.style.backgroundColor="red";
         return;
     }
     // usual mode
@@ -278,6 +304,14 @@ function render(postponed = false) {
     if(!postponed && postponedFrame) return;
     if(deltaTime > frameTime || postponed) {
         postponedFrame = false;
+        // render here
+        renderer.clear();
+        // render to rendering target
+        renderer.setRenderTarget(renderTarget);
+        renderer.clear();
+        renderer.render(sceneRTT, camera);
+        // render to canvas
+        renderer.setRenderTarget(null);
         renderer.render(scene, camera);
     } else {
         postponedFrame = true;
@@ -297,8 +331,10 @@ function updateImage(image) {
         var width = height * aspectRatio;
     }
     mesh.geometry.dispose();
+    meshRTT.geometry.dispose();
     var geometry = new THREE.PlaneGeometry(width, height);
     mesh.geometry = geometry;
+    meshRTT.geometry = geometry;
     // geometry.parameters.height = 2 - circleMeshRadius * 2;
     // geometry.parameters.width = geometry.parameters.height * aspectRatio;
     // geometry.needsUpdate = true;
