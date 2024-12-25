@@ -335,7 +335,7 @@ async function pasteAnImage() {
                 alert("Not an image.");
             }
         }
-        console.log(clipboardContents);
+        if(clipboardContents.length < 1) alert("Nothing in clipboard.");
     } catch (error) {
         alert(error.message);
         console.log(error.message);
