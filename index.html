@@ -60,6 +60,7 @@
       var pasteAnImage;
       var openAnImage;
       var clearCanvas;
+      var pickSubtitlesColor;
       var recognizeText;
     </script>
     <script type="module" defer>
@@ -68,6 +69,7 @@
         pasteAnImage = main.pasteAnImage;
         openAnImage = main.openAnImage;
         clearCanvas = main.clearCanvas;
+        pickSubtitlesColor = main.pickSubtitlesColor;
         recognizeText = main.recognizeText;
       })();
     </script>
@@ -86,6 +88,10 @@
     </div>
     <div id="canvas_container">
       <canvas width="4096" height="4096" id="main_canvas"></canvas>
+    </div>
+    <div id="color_picker">
+      <!-- <canvas width="1024" height="50"></canvas> -->
+      <a href="JavaScript:void(0);" onclick="pickSubtitlesColor();">Pick subtitles color.</a>
     </div>
     <div id="bottom_buttons">
       <a href="JavaScript:void(0);" onclick="recognizeText();">Recognize selected text.</a>

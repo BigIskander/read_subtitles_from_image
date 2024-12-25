@@ -40,6 +40,9 @@ var cutLineWidth = 7;
 // optimization
 var postponedFrame = false;
 var frameTime = 0.032; // in seconds (0.016 ~ 60FPS; 0.032 ~ 30FPS)
+// color picker mode
+var isColorPicker = false;
+var colorPicker = document.querySelector("#color_picker");
 
 function init() {
     camera = new THREE.Camera();
@@ -172,6 +175,13 @@ function applyConstraints(xy, circleID) {
 }
 
 function onCanvasMouse(event) {
+    // color picker mode
+    if(isColorPicker)
+    {
+
+        return;
+    }
+    // usual mode
     let isClicked = false;
     let circleID = 0;
     for(let i = 0; i < 4; i++) {
@@ -228,6 +238,14 @@ function onCanvasMouse(event) {
 }
 
 function onCanvasClick(event) {
+    // color picker mode
+    if(isColorPicker) {
+        isColorPicker = false;
+        canvas.style.cursor = 'default';
+        colorPicker.style.backgroundColor="red";
+        return;
+    }
+    // usual mode
     let isClicked = false;
     for(let i = 0; i < 4; i++) {
         if(clicked[i]) isClicked = true;
@@ -244,6 +262,7 @@ function onCanvasClick(event) {
 }
 
 function onMouseLeave(event) {
+    if(isColorPicker) return;
     canvas.style.cursor = 'default';
     for(let i = 0; i < 4; i++) {
         clicked[i] = false;
@@ -359,6 +378,12 @@ async function clearCanvas() {
     }
 }
 
+function pickSubtitlesColor() {
+    isColorPicker = true;
+    canvas.style.cursor = 'crosshair';
+    // alert("Pick subtitles color.");
+}
+
 async function recognizeText() {
     alert("Recognize text from an image");
 }
@@ -369,6 +394,7 @@ export {
     pasteAnImage,
     openAnImage,
     clearCanvas,
+    pickSubtitlesColor,
     recognizeText
 }
 
