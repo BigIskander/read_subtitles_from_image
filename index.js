@@ -200,12 +200,12 @@ function onCanvasMouse(event) {
         // transform from 0 - 1 to 0 - 255
         color.forEach((value, index, arr) => { arr[index] = parseInt(value * 255); });
         colorPicker.style.backgroundColor = "rgba(" + color.join(", ") + ")";
-        var color2 = [...color];
-        color2.forEach((value, index, arr) => { if(index < 3) arr[index] = 255 - value; });
-        colorPicker.style.color = "rgba(" + color2.join(", ") + ")";
+        var gscale = 0.2126 * color[0] + 0.7152 * color[1] + 0.0722 * color[2];
+        if(gscale < 128) var textColor = [255, 255, 255, 255];
+        else var textColor = [0, 0, 0, 255];
+        colorPicker.style.color = "rgba(" + textColor.join(", ") + ")";
         colorPicker.innerHTML = "rgba(" + color.join(", ") + ")";
         console.log(color);
-        console.log(color2);
         return;
     }
     // usual mode
@@ -442,3 +442,8 @@ export {
 // https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/read
 // use blob image as texture
 // https://stackoverflow.com/questions/41738664/is-it-possible-to-construct-a-three-texture-from-byte-array-rather-than-file-pat
+
+// color picker
+// https://github.com/mrdoob/three.js/blob/master/examples/webgl_read_float_buffer.html#L102
+// https://threejs.org/docs/#api/en/renderers/WebGLRenderer.readRenderTargetPixels
+// https://threejs.org/docs/#api/en/renderers/WebGLRenderTarget
