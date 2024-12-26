@@ -47,6 +47,9 @@ var frameTime = 0.032; // in seconds (0.016 ~ 60FPS; 0.032 ~ 30FPS)
 // color picker mode
 var isColorPicker = false;
 var colorPicker = document.querySelector("#subtitles_color");
+// for optimization (save render calls)
+var isImageUpdated = false;
+var isColorFUpdated = false;
 
 function init() {
     camera = new THREE.Camera();
@@ -273,6 +276,8 @@ function onCanvasClick(event) {
     if(isColorPicker) {
         isColorPicker = false;
         canvas.style.cursor = 'default';
+        isColorFUpdated = true;
+        render();
         return;
     }
     // usual mode
@@ -308,14 +313,21 @@ function render(postponed = false) {
         postponedFrame = false;
         // render here
         renderer.clear();
-        // render to rendering target
-        renderer.setRenderTarget(renderTarget);
-        renderer.clear();
-        renderer.render(sceneRTT, camera);
-        // render to second rendering target
-        renderer.setRenderTarget(renderTargetF);
-        renderer.clear();
-        renderer.render(sceneRTTF, camera);
+        // render to rendering target (for color picker)
+        if(isImageUpdated) {
+            renderer.setRenderTarget(renderTarget);
+            renderer.clear();
+            renderer.render(sceneRTT, camera);
+        }
+        // render to second rendering target (for filtering)
+        if(isImageUpdated || isColorFUpdated) {
+            renderer.setRenderTarget(renderTargetF);
+            renderer.clear();
+            renderer.render(sceneRTTF, camera);
+        }
+        // reset value
+        if(isImageUpdated) isImageUpdated = false;
+        if(isColorFUpdated) isColorFUpdated = false;
         // render to canvas
         renderer.setRenderTarget(null);
         renderer.render(scene, camera);
@@ -356,6 +368,7 @@ function updateImage(image) {
     textureF.image = image;
     textureF.needsUpdate = true;
     //
+    isImageUpdated = true;
     render();
 }
 
@@ -411,7 +424,19 @@ async function clearCanvas() {
         var geometry = new THREE.PlaneGeometry(0, 0);
         mesh.geometry = geometry;
         meshTexture.dispose();
-        meshTexture.needsUpdate = true;
+        
+        // Need to change this function...
+
+        // meshTexture.needsUpdate = true;
+        // isImageUpdated = true;
+        // isColorFUpdated = true;
+
+        // meshRTTF.material.uniforms.filterColor.value = [1.0, 1.0, 1.0];
+        // colorPicker.style.backgroundColor = "rgba(255, 255, 255, 255)";
+        // colorPicker.style.color = "rgba(0, 0, 0, 255)";
+        // colorPicker.innerHTML = "rgba(255, 255, 255, 255)";
+
+
         render();
     }
 }
