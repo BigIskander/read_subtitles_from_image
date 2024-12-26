@@ -427,9 +427,8 @@ function pickSubtitlesColor() {
 }
 
 // convert coordinates
-function relativeToPixel(xy, flipY = false) {
+function relativeToPixel(xy) {
     xy.x = parseInt(circleMeshRadius + (canvas.width * ((1.0 + xy.x) / 2.0)));
-    if(flipY) xy.y*=-1;
     xy.y = parseInt(circleMeshRadius + (canvas.height * ((1.0 + xy.y) / 2.0)));
     return xy;
 }
@@ -441,17 +440,17 @@ async function recognizeText() {
         0   1
     */
     var cutSqare = [
-        relativeToPixel({ x: circleMesh[0].position.x, y: circleMesh[0].position.y }, true),
-        relativeToPixel({ x: circleMesh[1].position.x, y: circleMesh[1].position.y }, true),
-        relativeToPixel({ x: circleMesh[2].position.x, y: circleMesh[2].position.y }, true),
-        relativeToPixel({ x: circleMesh[3].position.x, y: circleMesh[3].position.y }, true)
+        relativeToPixel({ x: circleMesh[0].position.x, y: circleMesh[0].position.y }),
+        relativeToPixel({ x: circleMesh[1].position.x, y: circleMesh[1].position.y }),
+        relativeToPixel({ x: circleMesh[2].position.x, y: circleMesh[2].position.y }),
+        relativeToPixel({ x: circleMesh[3].position.x, y: circleMesh[3].position.y })
     ];
     console.log(cutSqare);
-    var x = cutSqare[2].x;
-    var y = cutSqare[2].y;
-    var width = (cutSqare[3].x - cutSqare[2].x);
-    var height = (cutSqare[0].y - cutSqare[2].y);
-    var xy = getXY(event);
+    var x = cutSqare[0].x;
+    var y = cutSqare[0].y;
+    var width = (cutSqare[1].x - cutSqare[0].x);
+    var height = (cutSqare[2].y - cutSqare[0].y);
+    // var xy = getXY(event);
     // convert from relative to pixel coordinates
     
     // console.log(xy)
@@ -460,8 +459,14 @@ async function recognizeText() {
     var cutImage = new Float32Array(dataLength);
     renderer.readRenderTargetPixels(renderTarget, x, y, width, height, cutImage);
     console.log(cutImage);
+    // a little trick to flip the y axis
+    const r = 4 * width;
+    const getNewIndex = (index) => { return (height - Math.floor(index / r) - 1) * r + index % r };
+    // convert from Float32Array to Uint8ClampedArray
     const cutImageData = new Uint8ClampedArray(dataLength);
-    cutImage.forEach((value, index) => { cutImageData[index] = parseInt(value * 255); });
+    cutImage.forEach((value, index) => { 
+        cutImageData[getNewIndex(index)] = parseInt(value * 255); 
+    });
     console.log(cutImageData);
     var image = new Image();
     const testImage = document.querySelector("#test_image");
@@ -475,7 +480,7 @@ async function recognizeText() {
     // image flipped upside down why?
 
 
-    // testImage.src = imageCanvas.toDataURL("image/png");
+    testImage.src = imageCanvas.toDataURL("image/png");
     // document.body.append(imageCanvas);
     // testImage.src = URL.createObjectURL(imageData, { type: 'image/png' });
     // console.log(imageData);
