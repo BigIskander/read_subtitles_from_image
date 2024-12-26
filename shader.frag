@@ -4,7 +4,7 @@ uniform vec3 filterColor;
 varying vec2 textureUV;
 
 bool closeEnough(vec3 color, vec3 colorF) {
-	const float margin = 0.10;
+	const float margin = 0.15;
 	if(
 		colorF.r - margin <= color.r && color.r <= colorF.r + margin &&
 		colorF.g - margin <= color.g && color.g <= colorF.g + margin &&
