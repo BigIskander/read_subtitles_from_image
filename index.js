@@ -52,6 +52,9 @@ var isImageUpdated = true;
 var isColorFUpdated = true;
 // output the result
 var imageCanvas = document.querySelector("#test_canvas");
+// const testImage = document.querySelector("#test_image");
+var resultElement = document.querySelector("#result");
+resultElement.value = "";
 
 function init() {
     camera = new THREE.Camera();
@@ -492,12 +495,11 @@ async function recognizeText() {
     imageCanvas.height = height;
     var ctx = imageCanvas.getContext("2d");
     ctx.putImageData(imageData, 0, 0, 0, 0, width, height);
-    const testImage = document.querySelector("#test_image");
-    testImage.src = imageCanvas.toDataURL("image/png");
+    // testImage.src = imageCanvas.toDataURL("image/png");
 
     // Here will be call to backend and return result. 
     //...
-    
+    resultElement.value = "Here will be recognized text. \nThere is no backend yet...";
 }
 
 init();
