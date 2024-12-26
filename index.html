@@ -35,12 +35,11 @@
     <div id="top_buttons">
       <a href="JavaScript:void(0);" onclick="pasteAnImage();">Paste an image from clipboard.</a> ||
       Open image file: 
-      <input type="file"
+      <input id="file_choser" type="file"
         accept="image/apng, image/avif, image/gif, image/jpeg, 
         image/png, image/svg+xml,
         image/webp, image/bmp, image/x-icon, image/tiff"
-        onchange="openAnImage(event);"
-        style="width: 300px;"> ||
+        onchange="openAnImage(event);"> ||
       <a href="JavaScript:void(0);" onclick="clearCanvas();">Clear.</a>
     </div>
     <div id="canvas_container">
@@ -55,12 +54,12 @@
       <a href="JavaScript:void(0);" onclick="recognizeText();">Recognize selected text.</a>
     </div>
     <div id="results_div">
-      <div style="margin-bottom: 5px;">Recognized text:</div>
-      <textarea type="text" rows="3" style="width: 1024px; height: 450px; resize: none;"></textarea>
+      <div id="results_div_header">Recognized text:</div>
+      <textarea id="result" type="text" rows="3"></textarea>
     </div>
     <div>
       <img id="test_image" />
-      <canvas id="test_canvas" style="visibility: hidden; height: 0px; width: 0px;"></canvas>
+      <canvas id="test_canvas"></canvas>
     </div>
   </body>
 </html>
