@@ -49,6 +49,12 @@
       #bottom_buttons {
         /* background-color: red; */
         margin-top: 5px;
+        margin-bottom: 10px;
+        margin-left: 2%;
+        margin-right: 2%;
+      }
+      #results_div {
+        margin-top: 10px;
         margin-bottom: 5px;
         margin-left: 2%;
         margin-right: 2%;
@@ -103,10 +109,13 @@
     <div id="bottom_buttons">
       <a href="JavaScript:void(0);" onclick="recognizeText();">Recognize selected text.</a>
     </div>
+    <div id="results_div">
+      <div style="margin-bottom: 5px;">Recognized text:</div>
+      <textarea type="text" rows="3" style="width: 1024px; height: 450px; resize: none;"></textarea>
+    </div>
     <div>
       <img id="test_image" />
       <canvas id="test_canvas" style="visibility: hidden; height: 0px; width: 0px;"></canvas>
-      <!--  -->
     </div>
   </body>
 </html>

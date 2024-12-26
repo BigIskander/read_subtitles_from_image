@@ -50,6 +50,8 @@ var colorPicker = document.querySelector("#subtitles_color");
 // for optimization (save render calls)
 var isImageUpdated = true;
 var isColorFUpdated = true;
+// output the result
+var imageCanvas = document.querySelector("#test_canvas");
 
 function init() {
     camera = new THREE.Camera();
@@ -483,19 +485,19 @@ async function recognizeText() {
     const cutImageData = new Uint8ClampedArray(dataLength);
     cutImage.forEach((value, index) => { 
         cutImageData[getNewIndex(index)] = parseInt(value * 255); 
-    });
-    var image = new Image();
-    const testImage = document.querySelector("#test_image");
+    });  
     var imageData = new ImageData(cutImageData, width, height);
-    var imageCanvas = document.getElementById("test_canvas");
+    //
     imageCanvas.width = width;
     imageCanvas.height = height;
     var ctx = imageCanvas.getContext("2d");
     ctx.putImageData(imageData, 0, 0, 0, 0, width, height);
-    
+    const testImage = document.querySelector("#test_image");
+    testImage.src = imageCanvas.toDataURL("image/png");
+
     // Here will be call to backend and return result. 
     //...
-    testImage.src = imageCanvas.toDataURL("image/png");
+    
 }
 
 init();
