@@ -190,9 +190,10 @@ function onCanvasMouse(event) {
     if(isColorPicker)
     {
         var xy = getXY(event);
+        xy = relativeToPixel(xy);
         // convert from relative to pixel coordinates
-        xy.x = parseInt(canvas.width * ((1.0 + xy.x) / 2.0));
-        xy.y = parseInt(canvas.height * ((1.0 + xy.y) / 2.0));
+        // xy.x = parseInt(circleMeshRadius + (canvas.width * ((1.0 + xy.x) / 2.0)));
+        // xy.y = parseInt(circleMeshRadius + (canvas.height * ((1.0 + xy.y) / 2.0)));
         // console.log(xy)
         // read color of a pixel
         var color = new Float32Array(4);
@@ -425,8 +426,71 @@ function pickSubtitlesColor() {
     // alert("Pick subtitles color.");
 }
 
+// convert coordinates
+function relativeToPixel(xy, flipY = false) {
+    xy.x = parseInt(circleMeshRadius + (canvas.width * ((1.0 + xy.x) / 2.0)));
+    if(flipY) xy.y*=-1;
+    xy.y = parseInt(circleMeshRadius + (canvas.height * ((1.0 + xy.y) / 2.0)));
+    return xy;
+}
+
 async function recognizeText() {
-    alert("Recognize text from an image");
+    // get cutSqare
+    /*
+        2   3
+        0   1
+    */
+    var cutSqare = [
+        relativeToPixel({ x: circleMesh[0].position.x, y: circleMesh[0].position.y }, true),
+        relativeToPixel({ x: circleMesh[1].position.x, y: circleMesh[1].position.y }, true),
+        relativeToPixel({ x: circleMesh[2].position.x, y: circleMesh[2].position.y }, true),
+        relativeToPixel({ x: circleMesh[3].position.x, y: circleMesh[3].position.y }, true)
+    ];
+    console.log(cutSqare);
+    var x = cutSqare[2].x;
+    var y = cutSqare[2].y;
+    var width = (cutSqare[3].x - cutSqare[2].x);
+    var height = (cutSqare[0].y - cutSqare[2].y);
+    var xy = getXY(event);
+    // convert from relative to pixel coordinates
+    
+    // console.log(xy)
+    // read color of a pixel
+    var dataLength = 4 * width * height;
+    var cutImage = new Float32Array(dataLength);
+    renderer.readRenderTargetPixels(renderTarget, x, y, width, height, cutImage);
+    console.log(cutImage);
+    const cutImageData = new Uint8ClampedArray(dataLength);
+    cutImage.forEach((value, index) => { cutImageData[index] = parseInt(value * 255); });
+    console.log(cutImageData);
+    var image = new Image();
+    const testImage = document.querySelector("#test_image");
+    var imageData = new ImageData(cutImageData, width, height);
+    var imageCanvas = document.getElementById("test_canvas");
+    imageCanvas.width = width;
+    imageCanvas.height = height;
+    var ctx = imageCanvas.getContext("2d");
+    ctx.putImageData(imageData, 0, 0, 0, 0, width, height);
+
+    // image flipped upside down why?
+
+
+    // testImage.src = imageCanvas.toDataURL("image/png");
+    // document.body.append(imageCanvas);
+    // testImage.src = URL.createObjectURL(imageData, { type: 'image/png' });
+    // console.log(imageData);
+    // testImage.src = URL.createObjectURL(
+    //     new Blob([cutImageData], { type: 'image/png' } /* (1) */)
+    // );
+    
+    // image.onload = function() {
+    //     // updateImage(image);
+    //     testImage.src = image.src;
+    // };
+    // // image.src =
+    // console.log(new ImageData(cutImage, width, height));
+    
+    // alert("Recognize text from an image");
 }
 
 init();
