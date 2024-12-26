@@ -1,9 +1,7 @@
-#ifdef GL_ES
-precision mediump float;
-#endif
+uniform sampler2D textureImage;
 
-uniform float u_time;
+varying vec2 textureUV;
 
 void main() {
-	gl_FragColor = vec4(0.5,0.5,0.8,1.0);
+	gl_FragColor = vec4(texture2D(textureImage, textureUV).xyz, 1.0);
 }

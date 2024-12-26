@@ -3,24 +3,24 @@ import { Line2 } from 'jsm/lines/Line2.js';
 import { LineMaterial } from 'jsm/lines/LineMaterial.js';
 import { LineGeometry } from 'jsm/lines/LineGeometry.js';
 
-var camera, scene, renderer, clock, renderTarget, sceneRTT;
+var camera, scene, renderer, clock, renderTarget,renderTargetF, sceneRTT, sceneRTTF;
 var clicked = false;
 // var uniforms;
 
-// function load_shader(file_url) {
-//     return new Promise((resolve, reject) => {
-//         try {
-//             fetch(file_url).then(
-//                 (response) => response.text()).then((data) => { resolve(data); }
-//             );
-//         } catch(error) {
-//             reject(error);
-//         }
-//     });
-// }
+function load_shader(file_url) {
+    return new Promise((resolve, reject) => {
+        try {
+            fetch(file_url).then(
+                (response) => response.text()).then((data) => { resolve(data); }
+            );
+        } catch(error) {
+            reject(error);
+        }
+    });
+}
 
-// var vertexShader = await load_shader("./shader.vert");
-// var fragmentShader = await load_shader("/shader.frag");
+var vertexShader = await load_shader("./shader.vert");
+var fragmentShader = await load_shader("/shader.frag");
 
 var canvas = document.querySelector("#main_canvas");
 var canvasWidth = parseInt(window.getComputedStyle(canvas).width); // in pixels
@@ -28,7 +28,9 @@ var canvasHeight = parseInt(window.getComputedStyle(canvas).height); // in pixel
 var clearColor = 0x333333;
 var mesh;
 var meshRTT;
+var meshRTTF;
 var meshTexture;
+var textureF;
 var circleMesh = [];
 var clicked = [false, false, false, false];
 var circleMeshRadius = 0.03;
@@ -99,6 +101,7 @@ function init() {
     canvas.addEventListener("click", onCanvasClick);
     canvas.addEventListener("mouseleave", onMouseLeave);
 
+    // rendering target to color picking
     renderTarget = new THREE.WebGLRenderTarget(canvas.width, canvas.height, { 
         minFilter: THREE.LinearFilter, 
         magFilter: THREE.NearestFilter, 
@@ -108,6 +111,27 @@ function init() {
     sceneRTT = new THREE.Scene();
     meshRTT = mesh.clone();
     sceneRTT.add(meshRTT);
+
+    // rendering target to filter an image
+    renderTargetF = new THREE.WebGLRenderTarget(canvas.width, canvas.height, { 
+        minFilter: THREE.LinearFilter, 
+        magFilter: THREE.NearestFilter, 
+        format: THREE.RGBAFormat, 
+        type: THREE.FloatType
+    });
+    sceneRTTF = new THREE.Scene();
+    textureF = new THREE.Texture();
+    var materialF = new THREE.ShaderMaterial({
+        uniforms: {
+            textureF: {
+                value: textureF
+            }
+        },
+        vertexShader: vertexShader,
+        fragmentShader: fragmentShader
+    });
+    meshRTTF = new THREE.Mesh(geometry, materialF);
+    sceneRTTF.add(meshRTTF);
 
     renderer = new THREE.WebGLRenderer({
         antialias: true,
@@ -316,6 +340,10 @@ function render(postponed = false) {
         renderer.setRenderTarget(renderTarget);
         renderer.clear();
         renderer.render(sceneRTT, camera);
+        // render to second rendering target
+        renderer.setRenderTarget(renderTargetF);
+        renderer.clear();
+        renderer.render(sceneRTTF, camera);
         // render to canvas
         renderer.setRenderTarget(null);
         renderer.render(scene, camera);
@@ -338,9 +366,11 @@ function updateImage(image) {
     }
     mesh.geometry.dispose();
     meshRTT.geometry.dispose();
+    meshRTTF.geometry.dispose();
     var geometry = new THREE.PlaneGeometry(width, height);
     mesh.geometry = geometry;
     meshRTT.geometry = geometry;
+    meshRTTF.geometry = geometry;
     // geometry.parameters.height = 2 - circleMeshRadius * 2;
     // geometry.parameters.width = geometry.parameters.height * aspectRatio;
     // geometry.needsUpdate = true;
@@ -353,6 +383,14 @@ function updateImage(image) {
     meshTexture.image = image; 
     console.log(meshTexture);
     meshTexture.needsUpdate = true;
+    //
+    textureF.dispose();
+    textureF.colorSpace = THREE.SRGBColorSpace;
+    textureF.generateMipmaps = false;
+    textureF.minFilter = THREE.LinearFilter;
+    textureF.image = image;
+    textureF.needsUpdate = true;
+    //
     render();
     console.log(image); 
 }
@@ -457,7 +495,8 @@ async function recognizeText() {
     // read color of a pixel
     var dataLength = 4 * width * height;
     var cutImage = new Float32Array(dataLength);
-    renderer.readRenderTargetPixels(renderTarget, x, y, width, height, cutImage);
+    // renderer.readRenderTargetPixels(renderTarget, x, y, width, height, cutImage);
+    renderer.readRenderTargetPixels(renderTargetF, x, y, width, height, cutImage);
     console.log(cutImage);
     // a little trick to flip the y axis
     const r = 4 * width;
