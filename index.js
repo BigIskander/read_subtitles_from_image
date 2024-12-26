@@ -5,7 +5,6 @@ import { LineGeometry } from 'jsm/lines/LineGeometry.js';
 
 var camera, scene, renderer, clock, renderTarget,renderTargetF, sceneRTT, sceneRTTF;
 var clicked = false;
-// var uniforms;
 
 function load_shader(file_url) {
     return new Promise((resolve, reject) => {
@@ -19,6 +18,7 @@ function load_shader(file_url) {
     });
 }
 
+// filter shader
 var vertexShader = await load_shader("./shader.vert");
 var fragmentShader = await load_shader("/shader.frag");
 
@@ -57,18 +57,6 @@ function init() {
 
     var geometry = new THREE.PlaneGeometry(0, 0);
     var circle = new THREE.RingGeometry(circleMeshRadius - 0.005, circleMeshRadius, 32);
-
-    // uniforms = {
-    //     u_time: { type: "f", value: 1.0 },
-    //     u_resolution: { type: "v2", value: new THREE.Vector2() },
-    //     u_mouse: { type: "v2", value: new THREE.Vector2() }
-    // };
-
-    // var material = new THREE.ShaderMaterial({
-    //     uniforms: uniforms,
-    //     vertexShader: vertexShader,
-    //     fragmentShader: fragmentShader
-    // });
     
     meshTexture = new THREE.Texture();
     mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ map: meshTexture }));
@@ -144,23 +132,8 @@ function init() {
     renderer.setClearColor(clearColor);
     renderer.setPixelRatio(window.devicePixelRatio);
 
-    // onWindowResize();
-    // window.addEventListener('resize', onWindowResize, false);
-
-    // document.onmousemove = function(e){
-    //   uniforms.u_mouse.value.x = e.pageX
-    //   uniforms.u_mouse.value.y = window.innerHeight - e.pageY
-    // }
-
-    // renderer.setAnimationLoop(render);
     render();
 }
-
-// function onWindowResize() {
-//     renderer.setSize(window.innerWidth, window.innerHeight);
-//     uniforms.u_resolution.value.x = renderer.domElement.width;
-//     uniforms.u_resolution.value.y = renderer.domElement.height;
-// }
 
 function getXY(event) {
     var bBox = canvas.getBoundingClientRect();
@@ -219,17 +192,12 @@ function onCanvasMouse(event) {
     {
         var xy = getXY(event);
         xy = relativeToPixel(xy);
-        // convert from relative to pixel coordinates
-        // xy.x = parseInt(circleMeshRadius + (canvas.width * ((1.0 + xy.x) / 2.0)));
-        // xy.y = parseInt(circleMeshRadius + (canvas.height * ((1.0 + xy.y) / 2.0)));
-        // console.log(xy)
         // read color of a pixel
         var color = new Float32Array(4);
         renderer.readRenderTargetPixels(renderTarget, xy.x, xy.y, 1, 1, color);
         // transform from 0 - 1 to 0 - 255
         colorF = [parseFloat(color[0]), parseFloat(color[1]), parseFloat(color[2])];
         meshRTTF.material.uniforms.filterColor.value = colorF;
-        console.log(colorF);
         color.forEach((value, index, arr) => { arr[index] = parseInt(value * 255); });
         colorPicker.style.backgroundColor = "rgba(" + color.join(", ") + ")";
         var gscale = 0.2126 * color[0] + 0.7152 * color[1] + 0.0722 * color[2];
@@ -242,7 +210,6 @@ function onCanvasMouse(event) {
             return "" + value;
         }
         colorPicker.innerHTML = "rgba(" + [...color].map(colorMp).join(", ") + ")";
-        // console.log(color);
         return;
     }
     // usual mode
@@ -335,9 +302,7 @@ function onMouseLeave(event) {
 }
 
 function render(postponed = false) {
-    // uniforms.u_time.value += clock.getDelta();
     var deltaTime = clock.getDelta();
-    // circleMesh.position.x = 1;
     if(!postponed && postponedFrame) return;
     if(deltaTime > frameTime || postponed) {
         postponedFrame = false;
@@ -358,11 +323,9 @@ function render(postponed = false) {
         postponedFrame = true;
         setTimeout(() => { render(true); }, (frameTime - deltaTime) * 1000);
     }
-    //console.log(16 - deltaTime * 1000);//
 }
 
 function updateImage(image) {
-    // testImage.src = image.src;
     var aspectRatio = image.width / image.height;
     if(image.width > image.height) {
         var width = 2 - circleMeshRadius * 2;
@@ -378,17 +341,12 @@ function updateImage(image) {
     mesh.geometry = geometry;
     meshRTT.geometry = geometry;
     meshRTTF.geometry = geometry;
-    // geometry.parameters.height = 2 - circleMeshRadius * 2;
-    // geometry.parameters.width = geometry.parameters.height * aspectRatio;
-    // geometry.needsUpdate = true;
-    console.log(mesh);
-    console.log(aspectRatio);
+    //
     meshTexture.dispose();
     meshTexture.colorSpace = THREE.SRGBColorSpace;
     meshTexture.generateMipmaps = false;
     meshTexture.minFilter = THREE.LinearFilter;
     meshTexture.image = image; 
-    console.log(meshTexture);
     meshTexture.needsUpdate = true;
     //
     textureF.dispose();
@@ -399,7 +357,6 @@ function updateImage(image) {
     textureF.needsUpdate = true;
     //
     render();
-    console.log(image); 
 }
 
 async function pasteAnImage() {
@@ -408,16 +365,12 @@ async function pasteAnImage() {
         for (const item of clipboardContents) {
             // check if it is an image
             if (item.types.includes("image/png")) {
-                console.log("image");
                 const blob = await item.getType("image/png");
                 var image = new Image();
-                // const testImage = document.querySelector("#test_image");
                 image.onload = function() {
                     updateImage(image);
                 };
                 image.src = URL.createObjectURL(blob);
-                // meshTexture.image = testImage;
-                // meshTexture.needsUpdate = true;
             } else {
                 alert("Not an image.");
             }
@@ -425,12 +378,10 @@ async function pasteAnImage() {
         if(clipboardContents.length < 1) alert("Nothing in clipboard.");
     } catch (error) {
         alert(error.message);
-        console.log(error.message);
     }
 }
 
 async function openAnImage(event) {
-    console.log(event);
     if(event.target.files.length < 1) return;
     var imageFile = event.target.files[0];
     var supportedFileTypes = [
@@ -468,7 +419,6 @@ async function clearCanvas() {
 function pickSubtitlesColor() {
     isColorPicker = true;
     canvas.style.cursor = 'crosshair';
-    // alert("Pick subtitles color.");
 }
 
 // convert coordinates
@@ -490,21 +440,14 @@ async function recognizeText() {
         relativeToPixel({ x: circleMesh[2].position.x, y: circleMesh[2].position.y }),
         relativeToPixel({ x: circleMesh[3].position.x, y: circleMesh[3].position.y })
     ];
-    console.log(cutSqare);
     var x = cutSqare[0].x;
     var y = cutSqare[0].y;
     var width = (cutSqare[1].x - cutSqare[0].x);
     var height = (cutSqare[2].y - cutSqare[0].y);
-    // var xy = getXY(event);
-    // convert from relative to pixel coordinates
-    
-    // console.log(xy)
     // read color of a pixel
     var dataLength = 4 * width * height;
     var cutImage = new Float32Array(dataLength);
-    // renderer.readRenderTargetPixels(renderTarget, x, y, width, height, cutImage);
     renderer.readRenderTargetPixels(renderTargetF, x, y, width, height, cutImage);
-    console.log(cutImage);
     // a little trick to flip the y axis
     const r = 4 * width;
     const getNewIndex = (index) => { return (height - Math.floor(index / r) - 1) * r + index % r };
@@ -513,7 +456,6 @@ async function recognizeText() {
     cutImage.forEach((value, index) => { 
         cutImageData[getNewIndex(index)] = parseInt(value * 255); 
     });
-    console.log(cutImageData);
     var image = new Image();
     const testImage = document.querySelector("#test_image");
     var imageData = new ImageData(cutImageData, width, height);
@@ -522,26 +464,10 @@ async function recognizeText() {
     imageCanvas.height = height;
     var ctx = imageCanvas.getContext("2d");
     ctx.putImageData(imageData, 0, 0, 0, 0, width, height);
-
-    // image flipped upside down why?
-
-
+    
+    // Here will be call to backend and return result. 
+    //...
     testImage.src = imageCanvas.toDataURL("image/png");
-    // document.body.append(imageCanvas);
-    // testImage.src = URL.createObjectURL(imageData, { type: 'image/png' });
-    // console.log(imageData);
-    // testImage.src = URL.createObjectURL(
-    //     new Blob([cutImageData], { type: 'image/png' } /* (1) */)
-    // );
-    
-    // image.onload = function() {
-    //     // updateImage(image);
-    //     testImage.src = image.src;
-    // };
-    // // image.src =
-    // console.log(new ImageData(cutImage, width, height));
-    
-    // alert("Recognize text from an image");
 }
 
 init();
