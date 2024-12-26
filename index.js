@@ -48,8 +48,8 @@ var frameTime = 0.032; // in seconds (0.016 ~ 60FPS; 0.032 ~ 30FPS)
 var isColorPicker = false;
 var colorPicker = document.querySelector("#subtitles_color");
 // for optimization (save render calls)
-var isImageUpdated = false;
-var isColorFUpdated = false;
+var isImageUpdated = true;
+var isColorFUpdated = true;
 
 function init() {
     camera = new THREE.Camera();
@@ -421,22 +421,25 @@ async function openAnImage(event) {
 async function clearCanvas() {
     if(confirm("Clear?")) {
         mesh.geometry.dispose();
+        meshRTT.geometry.dispose();
+        meshRTTF.geometry.dispose();
         var geometry = new THREE.PlaneGeometry(0, 0);
         mesh.geometry = geometry;
+        meshRTT.geometry = geometry;
+        meshRTTF.geometry = geometry;
         meshTexture.dispose();
-        
-        // Need to change this function...
-
-        // meshTexture.needsUpdate = true;
-        // isImageUpdated = true;
-        // isColorFUpdated = true;
-
-        // meshRTTF.material.uniforms.filterColor.value = [1.0, 1.0, 1.0];
-        // colorPicker.style.backgroundColor = "rgba(255, 255, 255, 255)";
-        // colorPicker.style.color = "rgba(0, 0, 0, 255)";
-        // colorPicker.innerHTML = "rgba(255, 255, 255, 255)";
-
-
+        textureF.dispose();
+        //
+        meshTexture.needsUpdate = true;
+        textureF.needsUpdate = true;
+        isImageUpdated = true;
+        isColorFUpdated = true;
+        //
+        meshRTTF.material.uniforms.filterColor.value = [1.0, 1.0, 1.0];
+        colorPicker.style.backgroundColor = "rgba(255, 255, 255, 255)";
+        colorPicker.style.color = "rgba(0, 0, 0, 255)";
+        colorPicker.innerHTML = "rgba(255, 255, 255, 255)";
+        //
         render();
     }
 }
