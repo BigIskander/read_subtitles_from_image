@@ -31,6 +31,7 @@ var meshRTT;
 var meshRTTF;
 var meshTexture;
 var textureF;
+var colorF = [0.0, 0.0, 0.0];
 var circleMesh = [];
 var clicked = [false, false, false, false];
 var circleMeshRadius = 0.03;
@@ -125,6 +126,9 @@ function init() {
         uniforms: {
             textureF: {
                 value: textureF
+            },
+            filterColor: {
+                value: colorF
             }
         },
         vertexShader: vertexShader,
@@ -223,6 +227,9 @@ function onCanvasMouse(event) {
         var color = new Float32Array(4);
         renderer.readRenderTargetPixels(renderTarget, xy.x, xy.y, 1, 1, color);
         // transform from 0 - 1 to 0 - 255
+        colorF = [parseFloat(color[0]), parseFloat(color[1]), parseFloat(color[2])];
+        meshRTTF.material.uniforms.filterColor.value = colorF;
+        console.log(colorF);
         color.forEach((value, index, arr) => { arr[index] = parseInt(value * 255); });
         colorPicker.style.backgroundColor = "rgba(" + color.join(", ") + ")";
         var gscale = 0.2126 * color[0] + 0.7152 * color[1] + 0.0722 * color[2];
