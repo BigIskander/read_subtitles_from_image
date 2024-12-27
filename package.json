@@ -4,10 +4,11 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "dev": "npm-run-all --parallel vite express",
+    "dev": "npm-run-all --parallel vite express_dev",
     "build": "npx vite build && node helpers/copy_assets.js && npm-run-all --parallel express open_express_browser",
     "vite": "vite",
     "express": "node app.js",
+    "express_dev": "DEV=true node app.js",
     "open_express_browser": "node helpers/open_browser.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -22,6 +23,7 @@
   },
   "homepage": "https://github.com/BigIskander/read_subtitles_from_image#readme",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.21.2",
     "three": "^0.171.0"
   },

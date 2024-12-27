@@ -506,6 +506,22 @@ async function recognizeText() {
     // Here will be call to backend and return result. 
     // server_host
     //...
+
+
+    fetch(server_host + "/recognize", {
+        method: "POST",
+        body: JSON.stringify({
+          userId: 1,
+          title: "Fix my bugs",
+          completed: false
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8"
+        }
+    }).then((response) => {
+        console.log(response);
+    });
+
     resultElement.value = "Here will be recognized text. \nThere is no backend yet...";
 }
 
@@ -532,3 +548,6 @@ export {
 // https://github.com/mrdoob/three.js/blob/master/examples/webgl_read_float_buffer.html#L102
 // https://threejs.org/docs/#api/en/renderers/WebGLRenderer.readRenderTargetPixels
 // https://threejs.org/docs/#api/en/renderers/WebGLRenderTarget
+
+// sending post request
+// https://www.freecodecamp.org/news/javascript-post-request-how-to-send-an-http-post-request-in-js/
