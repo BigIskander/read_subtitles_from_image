@@ -11,6 +11,9 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
+    "dev": "npx vite",
+    "build": "npx vite build && node copy_assets.js",
+    "express": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
