@@ -122,8 +122,8 @@ async function init() {
     sceneRTTF = new THREE.Scene();
     textureF = new THREE.Texture();
     // filter shader
-    vertexShader = await load_shader("./shader.vert");
-    fragmentShader = await load_shader("/shader.frag");
+    vertexShader = await load_shader("/assets/shader.vert");
+    fragmentShader = await load_shader("/assets/shader.frag");
     var materialF = new THREE.ShaderMaterial({
         uniforms: {
             textureF: {

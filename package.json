@@ -5,10 +5,10 @@
   "main": "app.js",
   "scripts": {
     "dev": "npm-run-all --parallel vite express",
-    "build": "npx vite build && node copy_assets.js && npm-run-all --parallel express open_express_browser",
+    "build": "npx vite build && node helpers/copy_assets.js && npm-run-all --parallel express open_express_browser",
     "vite": "vite",
     "express": "node app.js",
-    "open_express_browser": "node open_browser.js",
+    "open_express_browser": "node helpers/open_browser.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
