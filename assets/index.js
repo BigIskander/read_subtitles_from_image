@@ -38,7 +38,6 @@ var mesh;
 var meshRTT;
 var meshRTTF;
 var meshTexture;
-// var textureF;
 // postprocessing effets
 var effect1, effect2, effect3;
 var colorF = [1.0, 1.0, 1.0];
@@ -131,8 +130,6 @@ async function init() {
     meshRTTF = mesh.clone();
     sceneRTTF.add(meshRTTF);
 
-    // textureF = new THREE.Texture();
-
     renderer = new THREE.WebGLRenderer({
         antialias: true,
         canvas: canvas
@@ -143,7 +140,7 @@ async function init() {
     // postprocessing
     // filter shader
     vertexShader = await load_shader("/assets/shader.vert");
-    fragmentShaderS = await load_shader("/assets/sharpen.frag");
+    // fragmentShaderS = await load_shader("/assets/sharpen.frag");
     fragmentShaderF = await load_shader("/assets/shader.frag");
     // Sharpen material
     // var materialS = new THREE.ShaderMaterial({
@@ -254,7 +251,6 @@ function onCanvasMouse(event) {
         renderer.readRenderTargetPixels(renderTarget, xy.x, xy.y, 1, 1, color);
         // transform from 0 - 1 to 0 - 255
         colorF = [parseFloat(color[0]), parseFloat(color[1]), parseFloat(color[2])];
-        // meshRTTF.material.uniforms.filterColor.value = colorF;
         effect2.uniforms['filterColor'].value = colorF;
         color.forEach((value, index, arr) => { arr[index] = parseInt(value * 255); });
         colorPicker.style.backgroundColor = "rgba(" + color.join(", ") + ")";
@@ -417,13 +413,6 @@ function updateImage(image) {
     meshTexture.image = image; 
     meshTexture.needsUpdate = true;
     //
-    // textureF.dispose();
-    // textureF.colorSpace = THREE.SRGBColorSpace;
-    // textureF.generateMipmaps = false;
-    // textureF.minFilter = THREE.LinearFilter;
-    // textureF.image = image;
-    // textureF.needsUpdate = true;
-    //
     isImageUpdated = true;
     render();
 }
@@ -484,17 +473,19 @@ async function clearCanvas() {
         meshRTT.geometry = geometry;
         meshRTTF.geometry = geometry;
         meshTexture.dispose();
-        // textureF.dispose();
         //
         meshTexture.needsUpdate = true;
-        // textureF.needsUpdate = true;
         isImageUpdated = true;
         isColorFUpdated = true;
         //
-        meshRTTF.material.uniforms.filterColor.value = [1.0, 1.0, 1.0];
+        effect2.uniforms['filterColor'].value = colorF;
         colorPicker.style.backgroundColor = "rgba(255, 255, 255, 255)";
         colorPicker.style.color = "rgba(0, 0, 0, 255)";
         colorPicker.innerHTML = "rgba(255, 255, 255, 255)";
+        resultElement.value = "";
+        applyFilter.checked = true;
+        effect2.uniforms['applyFilter'].value = true;
+        isColorFUpdated = true;
         //
         render();
     }
