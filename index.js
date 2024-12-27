@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { Line2 } from 'jsm/lines/Line2.js';
-import { LineMaterial } from 'jsm/lines/LineMaterial.js';
-import { LineGeometry } from 'jsm/lines/LineGeometry.js';
+import { Line2 } from 'three/examples/jsm/lines/Line2';
+import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
+import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry';
 
 var camera, scene, renderer, clock, renderTarget,renderTargetF, sceneRTT, sceneRTTF;
 var clicked = false;
