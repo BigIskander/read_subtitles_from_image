@@ -4,7 +4,7 @@ import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry';
 
 // backend server host
-const server_host = import.meta.env.PROD ? document.location.origin : "http://localhost:3007";
+const server_host = import.meta.env.PROD ? document.location.origin : "http://localhost:3000";
 
 var camera, scene, renderer, clock, renderTarget,renderTargetF, sceneRTT, sceneRTTF;
 var clicked = false;

@@ -8,7 +8,7 @@ Run in development environment:
 npm run dev
 ```
 
-Build
+Build:
 ```
 npm run build
 ```
