@@ -5,7 +5,7 @@ const app = express();
 const port = 3000;
 
 // to parse reqests
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '50mb'}));
 
 // set up cors, URL of vite dev environment
 var corsOptions = {

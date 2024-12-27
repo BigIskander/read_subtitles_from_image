@@ -10,11 +10,11 @@ var camera, scene, renderer, clock, renderTarget,renderTargetF, sceneRTT, sceneR
 var clicked = false;
 
 function load_shader(file_url) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         try {
-            fetch(file_url).then(
-                (response) => response.text()).then((data) => { resolve(data); }
-            );
+            var response = await fetch(file_url);
+            if(!response.ok) reject(`Response status: ${response.status}`);
+            resolve(response.text());
         } catch(error) {
             reject(error);
         }
