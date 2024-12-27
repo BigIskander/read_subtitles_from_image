@@ -19,8 +19,8 @@ function load_shader(file_url) {
 }
 
 // filter shader
-var vertexShader = await load_shader("./shader.vert");
-var fragmentShader = await load_shader("/shader.frag");
+var vertexShader;
+var fragmentShader;
 
 var canvas = document.querySelector("#main_canvas");
 var canvasWidth = parseInt(window.getComputedStyle(canvas).width); // in pixels
@@ -56,7 +56,7 @@ var imageCanvas = document.querySelector("#test_canvas");
 var resultElement = document.querySelector("#result");
 resultElement.value = "";
 
-function init() {
+async function init() {
     camera = new THREE.Camera();
     camera.position.z = 0.001;
 
@@ -118,6 +118,9 @@ function init() {
     });
     sceneRTTF = new THREE.Scene();
     textureF = new THREE.Texture();
+    // filter shader
+    vertexShader = await load_shader("./shader.vert");
+    fragmentShader = await load_shader("/shader.frag");
     var materialF = new THREE.ShaderMaterial({
         uniforms: {
             textureF: {
