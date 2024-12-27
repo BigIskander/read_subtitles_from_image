@@ -4,7 +4,7 @@ import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry';
 
 // backend server host
-const server_host = import.meta.env.PROD ? document.location.origin : "http://localhost:3000";
+const server_host = import.meta.env.PROD ? document.location.origin : "http://localhost:3007";
 
 var camera, scene, renderer, clock, renderTarget,renderTargetF, sceneRTT, sceneRTTF;
 var clicked = false;
@@ -515,9 +515,9 @@ async function recognizeText() {
 
 // request data from backend server
 function recognizeTextRequest(base64image) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         try {
-            fetch(server_host + "/recognize", {
+            var response = await fetch(server_host + "/recognize", {
                 method: "POST",
                 body: JSON.stringify({
                   base64image: base64image,
@@ -525,9 +525,9 @@ function recognizeTextRequest(base64image) {
                 headers: {
                   "Content-type": "application/json; charset=UTF-8"
                 }
-            }).then(
-                (response) => response.text()).then((data) => { resolve(data); }
-            );
+            });
+            if(!response.ok) reject(`Response status: ${response.status}`);
+            resolve(response.text());
         } catch(error) {
             reject(error);
         }
