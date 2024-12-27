@@ -505,24 +505,34 @@ async function recognizeText() {
 
     // Here will be call to backend and return result. 
     // server_host
-    //...
-
-
-    fetch(server_host + "/recognize", {
-        method: "POST",
-        body: JSON.stringify({
-          userId: 1,
-          title: "Fix my bugs",
-          completed: false
-        }),
-        headers: {
-          "Content-type": "application/json; charset=UTF-8"
-        }
-    }).then((response) => {
-        console.log(response);
-    });
-
+    // Call to backend
+    var getText = await recognizeTextRequest();
+    
+    console.log(getText);
     resultElement.value = "Here will be recognized text. \nThere is no backend yet...";
+}
+
+// request data from backend server
+function recognizeTextRequest() {
+    return new Promise((resolve, reject) => {
+        try {
+            fetch(server_host + "/recognize", {
+                method: "POST",
+                body: JSON.stringify({
+                  userId: 1,
+                  title: "Fix my bugs",
+                  completed: false
+                }),
+                headers: {
+                  "Content-type": "application/json; charset=UTF-8"
+                }
+            }).then(
+                (response) => response.text()).then((data) => { resolve(data); }
+            );
+        } catch(error) {
+            reject(error);
+        }
+    });
 }
 
 init();

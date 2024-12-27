@@ -1,7 +1,11 @@
 const express = require('express');
 const cors = require('cors');
+const bodyParser = require('body-parser')
 const app = express();
 const port = 3000;
+
+// to parse reqests
+app.use(bodyParser.json());
 
 // set up cors, URL of vite dev environment
 var corsOptions = {
@@ -21,7 +25,7 @@ app.use(express.static('dist'));
 // get a post request with image data
 app.post('/recognize', cors(corsOptions), (req, res) => {
   res.send('Got a POST request');
-  console.log(req);
+  console.log(req.body);
 });
 
 // output console
@@ -35,3 +39,5 @@ app.listen(port, () => {
 // https://expressjs.com/en/resources/middleware/cors.html
 // nodeJS env variables
 // https://nodejs.org/en/learn/command-line/how-to-read-environment-variables-from-nodejs
+// parse request
+// https://stackoverflow.com/questions/5710358/how-to-access-post-form-fields-in-express
