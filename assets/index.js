@@ -502,26 +502,25 @@ async function recognizeText() {
     var ctx = imageCanvas.getContext("2d");
     ctx.putImageData(imageData, 0, 0, 0, 0, width, height);
     // testImage.src = imageCanvas.toDataURL("image/png");
+    var base64image = imageCanvas.toDataURL("image/png");
 
-    // Here will be call to backend and return result. 
-    // server_host
-    // Call to backend
-    var getText = await recognizeTextRequest();
-    
-    console.log(getText);
-    resultElement.value = "Here will be recognized text. \nThere is no backend yet...";
+    try {
+        // Call to backend and display reselts
+        var getText = await recognizeTextRequest(base64image);
+        resultElement.value = getText;
+    } catch (error) {
+        alert(error.message);
+    }
 }
 
 // request data from backend server
-function recognizeTextRequest() {
+function recognizeTextRequest(base64image) {
     return new Promise((resolve, reject) => {
         try {
             fetch(server_host + "/recognize", {
                 method: "POST",
                 body: JSON.stringify({
-                  userId: 1,
-                  title: "Fix my bugs",
-                  completed: false
+                  base64image: base64image,
                 }),
                 headers: {
                   "Content-type": "application/json; charset=UTF-8"
