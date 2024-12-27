@@ -175,9 +175,9 @@ async function init() {
     composer.renderToScreen = false;
     composer.addPass(new RenderPass(sceneRTTF, camera));
     
-    // sharpen
-    effect1 = new ShaderPass(materialS);
-    composer.addPass(effect1);
+    // sharpen - is just not helpfull
+    // effect1 = new ShaderPass(materialS);
+    // composer.addPass(effect1);
     // filter
     effect2 = new ShaderPass(materialF);
     composer.addPass(effect2);
