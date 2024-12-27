@@ -32,6 +32,7 @@ app.post('/recognize', cors(corsOptions), (req, res) => {
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
   console.log(`http://localhost:${port}/`);
+  console.log("The change.");
 });
 
 // cors
