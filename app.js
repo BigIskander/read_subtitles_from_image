@@ -29,7 +29,7 @@ app.post('/recognize', cors(corsOptions), async (req, res) => {
   var imageBuffer = Buffer.from(imageDataUrl.split('base64,')[1], 'base64');
   // run tesseract
   var tesseract = "tesseract";
-  var commandArgs = ["-l", "eng", "--dpi", "96", "--oem", "3", "-", "stdout"];
+  var commandArgs = ["-l", "chi_sim", "--dpi", "96", "--oem", "3", "-", "stdout"];
   var tesseractProcess = childProcess.spawn(tesseract, commandArgs);
   // get results
   var result = await new Promise(async (resolve) => {

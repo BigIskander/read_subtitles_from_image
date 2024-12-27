@@ -123,7 +123,8 @@ async function init() {
     textureF = new THREE.Texture();
     // filter shader
     vertexShader = await load_shader("/assets/shader.vert");
-    fragmentShader = await load_shader("/assets/shader.frag");
+    fragmentShader = await load_shader("/assets/sharpen.frag");
+    // fragmentShader = await load_shader("/assets/shader.frag");
     var materialF = new THREE.ShaderMaterial({
         uniforms: {
             textureF: {
