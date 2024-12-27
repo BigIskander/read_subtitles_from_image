@@ -2,6 +2,10 @@ import * as THREE from 'three';
 import { Line2 } from 'three/examples/jsm/lines/Line2';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 // backend server host
 const server_host = import.meta.env.PROD ? document.location.origin : "http://localhost:3000";
@@ -23,7 +27,8 @@ function load_shader(file_url) {
 
 // filter shader
 var vertexShader;
-var fragmentShader;
+var fragmentShaderF, fragmentShaderS;
+var composer;
 
 var canvas = document.querySelector("#main_canvas");
 var canvasWidth = parseInt(window.getComputedStyle(canvas).width); // in pixels
@@ -33,7 +38,9 @@ var mesh;
 var meshRTT;
 var meshRTTF;
 var meshTexture;
-var textureF;
+// var textureF;
+// postprocessing effets
+var effect1, effect2, effect3;
 var colorF = [1.0, 1.0, 1.0];
 var circleMesh = [];
 var clicked = [false, false, false, false];
@@ -120,25 +127,10 @@ async function init() {
         type: THREE.FloatType
     });
     sceneRTTF = new THREE.Scene();
-    textureF = new THREE.Texture();
-    // filter shader
-    vertexShader = await load_shader("/assets/shader.vert");
-    fragmentShader = await load_shader("/assets/sharpen.frag");
-    // fragmentShader = await load_shader("/assets/shader.frag");
-    var materialF = new THREE.ShaderMaterial({
-        uniforms: {
-            textureF: {
-                value: textureF
-            },
-            filterColor: {
-                value: colorF
-            }
-        },
-        vertexShader: vertexShader,
-        fragmentShader: fragmentShader
-    });
-    meshRTTF = new THREE.Mesh(geometry, materialF);
+    meshRTTF = mesh.clone();
     sceneRTTF.add(meshRTTF);
+
+    // textureF = new THREE.Texture();
 
     renderer = new THREE.WebGLRenderer({
         antialias: true,
@@ -146,6 +138,57 @@ async function init() {
     });
     renderer.setClearColor(clearColor);
     renderer.setPixelRatio(window.devicePixelRatio);
+
+    // postprocessing
+    // filter shader
+    vertexShader = await load_shader("/assets/shader.vert");
+    fragmentShaderS = await load_shader("/assets/sharpen.frag");
+    fragmentShaderF = await load_shader("/assets/shader.frag");
+    // Sharpen material
+    var materialS = new THREE.ShaderMaterial({
+        uniforms: {
+            tDiffuse: {
+                value: null
+            },
+            sharp: {
+                value: true
+            }
+        },
+        vertexShader: vertexShader,
+        fragmentShader: fragmentShaderS
+    });
+    // Filter by color material
+    var materialF = new THREE.ShaderMaterial({
+        uniforms: {
+            tDiffuse: {
+                value: null
+            },
+            filterColor: {
+                value: colorF
+            },
+            filt: {
+                value: true
+            }
+        },
+        vertexShader: vertexShader,
+        fragmentShader: fragmentShaderF
+    });
+    //
+    composer = new EffectComposer(renderer, renderTargetF);
+    composer.renderToScreen = false;
+    composer.addPass(new RenderPass(sceneRTTF, camera));
+    // sharpen
+    effect1 = new ShaderPass(materialS);
+    effect1.uniforms['sharp'] = true;
+    composer.addPass(effect1);
+    // filter
+    effect2 = new ShaderPass(materialF);
+    effect2.uniforms['filt'].value = true;
+    effect2.uniforms['filterColor'].value = colorF;
+    composer.addPass(effect2);
+    // output
+    effect3 = new OutputPass();
+    composer.addPass(effect3);
 
     render();
 }
@@ -212,7 +255,8 @@ function onCanvasMouse(event) {
         renderer.readRenderTargetPixels(renderTarget, xy.x, xy.y, 1, 1, color);
         // transform from 0 - 1 to 0 - 255
         colorF = [parseFloat(color[0]), parseFloat(color[1]), parseFloat(color[2])];
-        meshRTTF.material.uniforms.filterColor.value = colorF;
+        // meshRTTF.material.uniforms.filterColor.value = colorF;
+        effect2.uniforms['filterColor'].value = colorF;
         color.forEach((value, index, arr) => { arr[index] = parseInt(value * 255); });
         colorPicker.style.backgroundColor = "rgba(" + color.join(", ") + ")";
         var gscale = 0.2126 * color[0] + 0.7152 * color[1] + 0.0722 * color[2];
@@ -335,7 +379,8 @@ function render(postponed = false) {
         if(isImageUpdated || isColorFUpdated) {
             renderer.setRenderTarget(renderTargetF);
             renderer.clear();
-            renderer.render(sceneRTTF, camera);
+            // 
+            composer.render();
         }
         // reset value
         if(isImageUpdated) isImageUpdated = false;
@@ -373,12 +418,12 @@ function updateImage(image) {
     meshTexture.image = image; 
     meshTexture.needsUpdate = true;
     //
-    textureF.dispose();
-    textureF.colorSpace = THREE.SRGBColorSpace;
-    textureF.generateMipmaps = false;
-    textureF.minFilter = THREE.LinearFilter;
-    textureF.image = image;
-    textureF.needsUpdate = true;
+    // textureF.dispose();
+    // textureF.colorSpace = THREE.SRGBColorSpace;
+    // textureF.generateMipmaps = false;
+    // textureF.minFilter = THREE.LinearFilter;
+    // textureF.image = image;
+    // textureF.needsUpdate = true;
     //
     isImageUpdated = true;
     render();
@@ -440,10 +485,10 @@ async function clearCanvas() {
         meshRTT.geometry = geometry;
         meshRTTF.geometry = geometry;
         meshTexture.dispose();
-        textureF.dispose();
+        // textureF.dispose();
         //
         meshTexture.needsUpdate = true;
-        textureF.needsUpdate = true;
+        // textureF.needsUpdate = true;
         isImageUpdated = true;
         isColorFUpdated = true;
         //
@@ -487,7 +532,7 @@ async function recognizeText() {
     // read color of a pixel
     var dataLength = 4 * width * height;
     var cutImage = new Float32Array(dataLength);
-    renderer.readRenderTargetPixels(renderTargetF, x, y, width, height, cutImage);
+    renderer.readRenderTargetPixels(composer.readBuffer, x, y, width, height, cutImage);
     // a little trick to flip the y axis
     const r = 4 * width;
     const getNewIndex = (index) => { return (height - Math.floor(index / r) - 1) * r + index % r };
