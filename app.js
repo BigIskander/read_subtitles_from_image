@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser')
+const childProcess = require('child_process');
 const app = express();
 const port = 3000;
 
@@ -23,9 +24,27 @@ if(process.env.DEV == 'true') {
 app.use(express.static('dist'));
 
 // get a post request with image data
-app.post('/recognize', cors(corsOptions), (req, res) => {
-  res.send('Got a POST request');
-  console.log(req.body);
+app.post('/recognize', cors(corsOptions), async (req, res) => {
+  var imageDataUrl = req.body.base64image;
+  var imageBuffer = Buffer.from(imageDataUrl.split('base64,')[1], 'base64');
+  // run tesseract
+  var tesseract = "tesseract";
+  var commandArgs = ["-l", "eng", "--dpi", "96", "--oem", "3", "-", "stdout"];
+  var tesseractProcess = childProcess.spawn(tesseract, commandArgs);
+  // get results
+  var result = await new Promise(async (resolve) => {
+    tesseractProcess.on('error', (err) => { resolve({ err: err.toString(), data: "" }); });
+    tesseractProcess.stdout.on('data', function (data) {
+      resolve({ err: "", data: data.toString() });
+    });
+    tesseractProcess.stderr.on('data', (err) => {
+      resolve({ err: err.toString(), data: "" });
+    });
+    tesseractProcess.stdin.write(imageBuffer);
+    tesseractProcess.stdin.end();
+  });
+  // return results to frontend
+  res.send(JSON.stringify(result));
 });
 
 // output console

@@ -506,10 +506,18 @@ async function recognizeText() {
 
     try {
         // Call to backend and display reselts
-        var getText = await recognizeTextRequest(base64image);
-        resultElement.value = getText;
+        var getResult = await recognizeTextRequest(base64image);
+        if(getResult.err != "") {
+            alert("Tesseract OCR error: " + getResult.err);
+            console.log(getResult.err);
+        } else {
+            var text = getResult.data;
+            text.replace(/(?:\r\n|\r|\n|\t)/g, ' ').replace(/(?:\s\s+)/g, ' ').trim();
+            resultElement.value = text;
+        }
     } catch (error) {
         alert(error.message);
+        console.log(error.message);
     }
 }
 
@@ -527,7 +535,7 @@ function recognizeTextRequest(base64image) {
                 }
             });
             if(!response.ok) reject(`Response status: ${response.status}`);
-            resolve(response.text());
+            resolve(response.json());
         } catch(error) {
             reject(error);
         }
