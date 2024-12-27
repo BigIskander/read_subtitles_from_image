@@ -10,7 +10,7 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 // backend server host
 const server_host = import.meta.env.PROD ? document.location.origin : "http://localhost:3000";
 
-var camera, scene, renderer, clock, renderTarget,renderTargetF, sceneRTT, sceneRTTF;
+var camera, scene, renderer, clock, renderTarget, renderTargetF, sceneRTT, sceneRTTF;
 var clicked = false;
 
 function load_shader(file_url) {
@@ -165,9 +165,6 @@ async function init() {
             },
             filterColor: {
                 value: colorF
-            },
-            filt: {
-                value: true
             }
         },
         vertexShader: vertexShader,
@@ -177,17 +174,15 @@ async function init() {
     composer = new EffectComposer(renderer, renderTargetF);
     composer.renderToScreen = false;
     composer.addPass(new RenderPass(sceneRTTF, camera));
+    
     // sharpen
     effect1 = new ShaderPass(materialS);
-    effect1.uniforms['sharp'] = true;
     composer.addPass(effect1);
     // filter
     effect2 = new ShaderPass(materialF);
-    effect2.uniforms['filt'].value = true;
-    effect2.uniforms['filterColor'].value = colorF;
     composer.addPass(effect2);
-    // output
-    effect3 = new OutputPass();
+    // output final image
+    const effect3 = new OutputPass();
     composer.addPass(effect3);
 
     render();
@@ -532,7 +527,7 @@ async function recognizeText() {
     // read color of a pixel
     var dataLength = 4 * width * height;
     var cutImage = new Float32Array(dataLength);
-    renderer.readRenderTargetPixels(composer.readBuffer, x, y, width, height, cutImage);
+    renderer.readRenderTargetPixels(renderTargetF, x, y, width, height, cutImage);
     // a little trick to flip the y axis
     const r = 4 * width;
     const getNewIndex = (index) => { return (height - Math.floor(index / r) - 1) * r + index % r };

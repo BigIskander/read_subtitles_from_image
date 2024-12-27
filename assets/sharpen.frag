@@ -1,8 +1,8 @@
-uniform sampler2D textureImage;
+uniform sampler2D tDiffuse;
 uniform vec3 filterColor;
 uniform bool sharp;
 
-varying vec2 textureUV;
+varying vec2 vUv;
 
 const float offset = 1.0 / 300.0; 
 
@@ -28,7 +28,7 @@ vec3 sharpen() {
 	vec3 sampleTex[9];
     for(int i = 0; i < 9; i++)
     {
-        sampleTex[i] = vec3(texture2D(textureImage, textureUV + offsets[i]));
+        sampleTex[i] = vec3(texture2D(tDiffuse, vUv + offsets[i]));
     }
     vec3 col = vec3(0.0);
     for(int i = 0; i < 9; i++)
@@ -38,10 +38,7 @@ vec3 sharpen() {
 }
 
 void main() {
-    vec3 col;
-    if(sharp) col = sharpen();
-    else col = vec3(texture2D(textureImage, textureUV));
-    gl_FragColor = vec4(col, 1.0);
+    gl_FragColor = vec4(sharpen(), 1.0);
 }
 
 // sharpen shader example

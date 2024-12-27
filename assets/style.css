@@ -66,8 +66,8 @@ body {
     height: 450px; 
     resize: none;
 }
-#test_canvas {
+/* #test_canvas {
     visibility: hidden; 
     height: 0px; 
     width: 0px;
-}
+} */
