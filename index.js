@@ -31,7 +31,7 @@ var meshRTT;
 var meshRTTF;
 var meshTexture;
 var textureF;
-var colorF = [0.0, 0.0, 0.0];
+var colorF = [1.0, 1.0, 1.0];
 var circleMesh = [];
 var clicked = [false, false, false, false];
 var circleMeshRadius = 0.03;
