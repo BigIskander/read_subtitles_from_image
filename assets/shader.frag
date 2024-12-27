@@ -1,5 +1,6 @@
 uniform sampler2D tDiffuse;
 uniform vec3 filterColor;
+uniform bool applyFilter;
 
 varying vec2 vUv;
 
@@ -14,8 +15,12 @@ bool closeEnough(vec3 color, vec3 colorF) {
 }
 
 void main() {
-	if(closeEnough(texture2D(tDiffuse, vUv).xyz, filterColor))
-		gl_FragColor = vec4(vec3(0.0), 1.0);
-	else
-		gl_FragColor = vec4(vec3(1.0), 1.0);
+	if(applyFilter) {
+		if(closeEnough(texture2D(tDiffuse, vUv).xyz, filterColor))
+			gl_FragColor = vec4(vec3(0.0), 1.0);
+		else
+			gl_FragColor = vec4(vec3(1.0), 1.0);
+	} else {
+		gl_FragColor = vec4(texture2D(tDiffuse, vUv).xyz, 1.0);
+	}
 }

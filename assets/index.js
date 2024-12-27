@@ -56,6 +56,7 @@ var postponedFrame = false;
 var frameTime = 0.032; // in seconds (0.016 ~ 60FPS; 0.032 ~ 30FPS)
 // color picker mode
 var isColorPicker = false;
+var applyFilter = document.querySelector("#apply_filter");
 var colorPicker = document.querySelector("#subtitles_color");
 // for optimization (save render calls)
 var isImageUpdated = true;
@@ -145,18 +146,18 @@ async function init() {
     fragmentShaderS = await load_shader("/assets/sharpen.frag");
     fragmentShaderF = await load_shader("/assets/shader.frag");
     // Sharpen material
-    var materialS = new THREE.ShaderMaterial({
-        uniforms: {
-            tDiffuse: {
-                value: null
-            },
-            sharp: {
-                value: true
-            }
-        },
-        vertexShader: vertexShader,
-        fragmentShader: fragmentShaderS
-    });
+    // var materialS = new THREE.ShaderMaterial({
+    //     uniforms: {
+    //         tDiffuse: {
+    //             value: null
+    //         },
+    //         sharp: {
+    //             value: true
+    //         }
+    //     },
+    //     vertexShader: vertexShader,
+    //     fragmentShader: fragmentShaderS
+    // });
     // Filter by color material
     var materialF = new THREE.ShaderMaterial({
         uniforms: {
@@ -165,6 +166,9 @@ async function init() {
             },
             filterColor: {
                 value: colorF
+            },
+            applyFilter: {
+                value: true
             }
         },
         vertexShader: vertexShader,
@@ -501,6 +505,13 @@ function pickSubtitlesColor() {
     canvas.style.cursor = 'crosshair';
 }
 
+function applySubtitlesColor() {
+    if(applyFilter.checked) effect2.uniforms['applyFilter'].value = true;
+    else effect2.uniforms['applyFilter'].value = false;
+    isColorFUpdated = true;
+    render();
+}
+
 // convert coordinates
 function relativeToPixel(xy) {
     xy.x = parseInt(circleMeshRadius + (canvas.width * ((1.0 + xy.x) / 2.0)));
@@ -589,6 +600,7 @@ export {
     pasteAnImage,
     openAnImage,
     clearCanvas,
+    applySubtitlesColor,
     pickSubtitlesColor,
     recognizeText
 }
