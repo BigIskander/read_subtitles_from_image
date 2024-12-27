@@ -3,6 +3,9 @@ import { Line2 } from 'three/examples/jsm/lines/Line2';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry';
 
+// backend server host
+const server_host = import.meta.env.PROD ? document.location.origin : "http://localhost:3000";
+
 var camera, scene, renderer, clock, renderTarget,renderTargetF, sceneRTT, sceneRTTF;
 var clicked = false;
 
@@ -501,6 +504,7 @@ async function recognizeText() {
     // testImage.src = imageCanvas.toDataURL("image/png");
 
     // Here will be call to backend and return result. 
+    // server_host
     //...
     resultElement.value = "Here will be recognized text. \nThere is no backend yet...";
 }
