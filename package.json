@@ -1,11 +1,4 @@
 {
-  "dependencies": {
-    "express": "^4.21.2",
-    "three": "^0.171.0"
-  },
-  "devDependencies": {
-    "vite": "^6.0.6"
-  },
   "name": "read_subtitles_from_image",
   "description": "The application to get text from subtitles integrated in image.",
   "version": "1.0.0",
@@ -25,5 +18,12 @@
   "bugs": {
     "url": "https://github.com/BigIskander/read_subtitles_from_image/issues"
   },
-  "homepage": "https://github.com/BigIskander/read_subtitles_from_image#readme"
+  "homepage": "https://github.com/BigIskander/read_subtitles_from_image#readme",
+  "dependencies": {
+    "express": "^4.21.2",
+    "three": "^0.171.0"
+  },
+  "devDependencies": {
+    "vite": "^6.0.6"
+  }
 }
