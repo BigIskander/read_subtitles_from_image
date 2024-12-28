@@ -140,21 +140,7 @@ async function init() {
     // postprocessing
     // filter shader
     vertexShader = await load_shader("/assets/shader.vert");
-    // fragmentShaderS = await load_shader("/assets/sharpen.frag");
     fragmentShaderF = await load_shader("/assets/shader.frag");
-    // Sharpen material
-    // var materialS = new THREE.ShaderMaterial({
-    //     uniforms: {
-    //         tDiffuse: {
-    //             value: null
-    //         },
-    //         sharp: {
-    //             value: true
-    //         }
-    //     },
-    //     vertexShader: vertexShader,
-    //     fragmentShader: fragmentShaderS
-    // });
     // Filter by color material
     var materialF = new THREE.ShaderMaterial({
         uniforms: {
