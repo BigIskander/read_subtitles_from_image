@@ -186,6 +186,8 @@ async function init() {
     const effect3 = new OutputPass();
     composer.addPass(effect3);
 
+    applyFilter.checked = true; 
+
     render();
 }
 
