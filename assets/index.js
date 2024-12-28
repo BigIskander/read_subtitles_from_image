@@ -66,6 +66,8 @@ var imageCanvas = document.querySelector("#test_canvas");
 var resultElement = document.querySelector("#result");
 var resultStatusElement = document.querySelector("#results_status");
 resultElement.value = "";
+// to handle file drops
+var fileChooserElement = document.querySelector("#file_choser");
 
 async function init() {
     camera = new THREE.Camera();
@@ -114,6 +116,10 @@ async function init() {
     canvas.addEventListener("touchstart", onCanvasMouseDown);
     canvas.addEventListener("touchend", onCanvasMouseUp);
     canvas.addEventListener("touchcancel", onCanvasMouseUp);
+    // handle image file drop event
+    canvas.addEventListener("drop", loadDropImage);
+    window.addEventListener("dragover",function(e){ e.preventDefault(); });
+    window.addEventListener("drop",function(e) { e.preventDefault(); });
 
     // rendering target to color picking
     renderTarget = new THREE.WebGLRenderTarget(canvas.width, canvas.height, { 
@@ -465,9 +471,14 @@ async function pasteAnImage() {
     }
 }
 
+function loadDropImage(event) {
+    fileChooserElement.files = event.dataTransfer.files;   
+    fileChooserElement.onchange();
+}
+
 async function openAnImage(event) {
-    if(event.target.files.length < 1) return;
-    var imageFile = event.target.files[0];
+    if(fileChooserElement.files.length < 1) return;
+    var imageFile = fileChooserElement.files[0];
     var supportedFileTypes = [
                 'image/apng', 'image/avif', 'image/gif', 'image/jpeg', 
                 'image/png', 'image/svg+xml',
@@ -647,3 +658,6 @@ export {
 
 // sending post request
 // https://www.freecodecamp.org/news/javascript-post-request-how-to-send-an-http-post-request-in-js/
+
+// prevent opening new tab on image drop
+// https://stackoverflow.com/questions/67467782/how-to-prevent-to-open-new-tab-when-i-drag-and-drop-image-on-the-chrome-browser
