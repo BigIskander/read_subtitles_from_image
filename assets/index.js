@@ -64,6 +64,7 @@ var isColorFUpdated = true;
 var imageCanvas = document.querySelector("#test_canvas");
 // const testImage = document.querySelector("#test_image");
 var resultElement = document.querySelector("#result");
+var resultStatusElement = document.querySelector("#results_status");
 resultElement.value = "";
 
 async function init() {
@@ -173,6 +174,7 @@ async function init() {
     composer.addPass(effect3);
 
     applyFilter.checked = true; 
+    resultStatusElement.style.color = "#00ff00";
 
     render();
 }
@@ -378,6 +380,9 @@ function render(postponed = false) {
 }
 
 function updateImage(image) {
+    resultStatusElement.style.color = "#00ff00";
+    resultStatusElement.innerHTML = "";
+    //
     var aspectRatio = image.width / image.height;
     if(image.width > image.height) {
         var width = 2 - circleMeshRadius * 2;
@@ -474,6 +479,8 @@ async function clearCanvas() {
         applyFilter.checked = true;
         effect2.uniforms['applyFilter'].value = true;
         isColorFUpdated = true;
+        resultStatusElement.style.color = "#00ff00";
+        resultStatusElement.innerHTML = "";
         //
         render();
     }
@@ -499,6 +506,8 @@ function relativeToPixel(xy) {
 }
 
 async function recognizeText() {
+    resultStatusElement.style.color = "#00ff00";
+    resultStatusElement.innerHTML = "In progress..."
     // get cutSqare
     /*
         2   3
@@ -539,14 +548,19 @@ async function recognizeText() {
         // Call to backend and display reselts
         var getResult = await recognizeTextRequest(base64image);
         if(getResult.err != "") {
+            resultStatusElement.style.color = "#ff0000";
+            resultStatusElement.innerHTML = "An error occurred.";
             alert("Tesseract OCR error: " + getResult.err);
             console.log(getResult.err);
         } else {
             var text = getResult.data;
             text.replace(/(?:\r\n|\r|\n|\t)/g, ' ').replace(/(?:\s\s+)/g, ' ').trim();
             resultElement.value = text;
+            resultStatusElement.innerHTML = "";
         }
     } catch (error) {
+        resultStatusElement.style.color = "#ff0000";
+        resultStatusElement.innerHTML = "An error occurred.";
         alert(error.message);
         console.log(error.message);
     }

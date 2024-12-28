@@ -66,6 +66,11 @@ body {
     height: 450px; 
     resize: none;
 }
+#results_status {
+    color: #00ff00;
+    padding-left: 5px;
+    padding-right: 5px;
+}
 #test_canvas {
     visibility: hidden; 
     height: 0px; 
