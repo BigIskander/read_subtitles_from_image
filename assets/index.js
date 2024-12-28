@@ -106,8 +106,14 @@ async function init() {
     scene.add(cutLine);
 
     canvas.addEventListener("mousemove", onCanvasMouse);
-    canvas.addEventListener("click", onCanvasClick);
+    canvas.addEventListener("mousedown", onCanvasMouseDown);
+    canvas.addEventListener("mouseup", onCanvasMouseUp);
     canvas.addEventListener("mouseleave", onMouseLeave);
+    // for touch controll
+    canvas.addEventListener("touchmove", onCanvasMouse);
+    canvas.addEventListener("touchstart", onCanvasMouseDown);
+    canvas.addEventListener("touchend", onCanvasMouseUp);
+    canvas.addEventListener("touchcancel", onCanvasMouseUp);
 
     // rendering target to color picking
     renderTarget = new THREE.WebGLRenderTarget(canvas.width, canvas.height, { 
@@ -183,8 +189,22 @@ function getXY(event) {
     var bBox = canvas.getBoundingClientRect();
     var xc = bBox.left + window.scrollX;
     var yc = bBox.top + window.scrollY;
-    var x = ((event.pageX - xc) / canvasWidth) * 2.0 - 1.0;
-    var y = ((event.pageY - yc) / canvasHeight) * 2.0 - 1.0;
+    var gx, gy;
+    switch(event.type) {
+        case "touchstart":
+            gx = event.touches[0].pageX;
+            gy = event.touches[0].pageY;
+            break;
+        case "touchmove":
+            gx = event.changedTouches[0].pageX;
+            gy = event.changedTouches[0].pageY;
+            break;
+        default:
+            gx = event.pageX;
+            gy = event.pageY;
+    }
+    var x = ((gx - xc) / canvasWidth) * 2.0 - 1.0;
+    var y = ((gy - yc) / canvasHeight) * 2.0 - 1.0;
     y *= -1; // flip y
     return { x: x, y: y };
 }
@@ -230,30 +250,35 @@ function applyConstraints(xy, circleID) {
     return xy;
 }
 
+// color picker mode
+function pickColor(event) {    
+    var xy = getXY(event);
+    xy = relativeToPixel(xy);
+    // read color of a pixel
+    var color = new Float32Array(4);
+    renderer.readRenderTargetPixels(renderTarget, xy.x, xy.y, 1, 1, color);
+    // transform from 0 - 1 to 0 - 255
+    colorF = [parseFloat(color[0]), parseFloat(color[1]), parseFloat(color[2])];
+    effect2.uniforms['filterColor'].value = colorF;
+    color.forEach((value, index, arr) => { arr[index] = parseInt(value * 255); });
+    colorPicker.style.backgroundColor = "rgba(" + color.join(", ") + ")";
+    var gscale = 0.2126 * color[0] + 0.7152 * color[1] + 0.0722 * color[2];
+    if(gscale < 128) var textColor = [255, 255, 255, 255];
+    else var textColor = [0, 0, 0, 255];
+    colorPicker.style.color = "rgba(" + textColor.join(", ") + ")";
+    var colorMp = (value) => { 
+        if(value < 10) return "&nbsp;&nbsp" + value;
+        if(value < 100) return "&nbsp" + value;
+        return "" + value;
+    }
+    colorPicker.innerHTML = "rgba(" + [...color].map(colorMp).join(", ") + ")";
+}
+
 function onCanvasMouse(event) {
+    event.preventDefault();
     // color picker mode
-    if(isColorPicker)
-    {
-        var xy = getXY(event);
-        xy = relativeToPixel(xy);
-        // read color of a pixel
-        var color = new Float32Array(4);
-        renderer.readRenderTargetPixels(renderTarget, xy.x, xy.y, 1, 1, color);
-        // transform from 0 - 1 to 0 - 255
-        colorF = [parseFloat(color[0]), parseFloat(color[1]), parseFloat(color[2])];
-        effect2.uniforms['filterColor'].value = colorF;
-        color.forEach((value, index, arr) => { arr[index] = parseInt(value * 255); });
-        colorPicker.style.backgroundColor = "rgba(" + color.join(", ") + ")";
-        var gscale = 0.2126 * color[0] + 0.7152 * color[1] + 0.0722 * color[2];
-        if(gscale < 128) var textColor = [255, 255, 255, 255];
-        else var textColor = [0, 0, 0, 255];
-        colorPicker.style.color = "rgba(" + textColor.join(", ") + ")";
-        var colorMp = (value) => { 
-            if(value < 10) return "&nbsp;&nbsp" + value;
-            if(value < 100) return "&nbsp" + value;
-            return "" + value;
-        }
-        colorPicker.innerHTML = "rgba(" + [...color].map(colorMp).join(", ") + ")";
+    if(isColorPicker) {
+        pickColor(event);
         return;
     }
     // usual mode
@@ -312,7 +337,24 @@ function onCanvasMouse(event) {
     render();
 }
 
-function onCanvasClick(event) {
+function onCanvasMouseDown(event) {
+    // color picker mode
+    if(isColorPicker) {
+        pickColor(event);
+        return;
+    }
+    // usual mode
+    for(let i = 0; i < 4; i++) {
+        if(isWithinCircle(event, i)) {
+            canvas.style.cursor = 'grabbing';
+            clicked[i] = true;
+        } else {
+            clicked[i] = false;
+        }
+    }
+}
+
+function onCanvasMouseUp(event) {
     // color picker mode
     if(isColorPicker) {
         isColorPicker = false;
@@ -322,19 +364,10 @@ function onCanvasClick(event) {
         return;
     }
     // usual mode
-    let isClicked = false;
     for(let i = 0; i < 4; i++) {
-        if(clicked[i]) isClicked = true;
+        clicked[i] = false;
     }
-    if(isClicked) {
-        for(let i = 0; i < 4; i++) {
-            clicked[i] = false;
-        }
-    } else {
-        for(let i = 0; i < 4; i++) {
-            if(isWithinCircle(event, i)) clicked[i] = true;
-        }
-    }
+    canvas.style.cursor = 'default';
 }
 
 function onMouseLeave(event) {
