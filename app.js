@@ -50,7 +50,8 @@ app.post('/recognize', cors(corsOptions), async (req, res) => {
 
 // output console
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  console.log("read_subtitles_from_image");
+  console.log(`The application is listening on port ${port}`);
   console.log(`http://localhost:${port}/`);
   console.log("The change.");
 });
