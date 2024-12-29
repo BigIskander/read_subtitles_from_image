@@ -3,7 +3,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser')
 const childProcess = require('child_process');
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // to parse reqests
 app.use(bodyParser.json({limit: '50mb'}));
