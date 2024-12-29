@@ -4,6 +4,7 @@ const bodyParser = require('body-parser')
 const childProcess = require('child_process');
 const app = express();
 const port = process.env.PORT || 3000;
+const lang = process.env.TESSLANG || "chi_all";
 
 // to parse reqests
 app.use(bodyParser.json({limit: '50mb'}));
@@ -29,7 +30,7 @@ app.post('/recognize', cors(corsOptions), async (req, res) => {
   var imageBuffer = Buffer.from(imageDataUrl.split('base64,')[1], 'base64');
   // run tesseract
   var tesseract = "tesseract";
-  var commandArgs = ["-l", "chi_sim", "--dpi", "96", "--oem", "3", "-", "stdout"];
+  var commandArgs = ["-l", lang, "--dpi", "96", "--oem", "3", "-", "stdout"];
   var tesseractProcess = childProcess.spawn(tesseract, commandArgs);
   // get results
   var result = await new Promise(async (resolve) => {
