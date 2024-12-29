@@ -164,7 +164,7 @@ async function init() {
                 value: colorF
             },
             applyFilter: {
-                value: true
+                value: false
             }
         },
         vertexShader: vertexShader,
@@ -185,7 +185,7 @@ async function init() {
     const effect3 = new OutputPass();
     composer.addPass(effect3);
 
-    applyFilter.checked = true; 
+    applyFilter.checked = false; 
     resultStatusElement.style.color = "#00ff00";
 
     render();
@@ -521,8 +521,8 @@ async function clearCanvas() {
         colorPicker.style.color = "rgba(0, 0, 0, 255)";
         colorPicker.innerHTML = "rgba(255, 255, 255, 255)";
         resultElement.value = "";
-        applyFilter.checked = true;
-        effect2.uniforms['applyFilter'].value = true;
+        applyFilter.checked = false;
+        effect2.uniforms['applyFilter'].value = false;
         isColorFUpdated = true;
         resultStatusElement.style.color = "#00ff00";
         resultStatusElement.innerHTML = "";
