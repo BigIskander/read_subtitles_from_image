@@ -1,6 +1,6 @@
 version: '3.5'
 services:
-  photoprism:
+  server:
     container_name: read_subtitles_from_image
     image: read_subtitles_from_image:latest
     restart: unless-stopped
