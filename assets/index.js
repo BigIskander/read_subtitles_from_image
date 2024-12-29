@@ -281,9 +281,9 @@ function pickColor(event) {
 }
 
 function onCanvasMouse(event) {
-    event.preventDefault();
     // color picker mode
     if(isColorPicker) {
+        event.preventDefault();
         pickColor(event);
         return;
     }
@@ -297,6 +297,7 @@ function onCanvasMouse(event) {
         }
     }
     if(isClicked) {
+        event.preventDefault();
         // if clicked
         var xy = getXY(event);
         xy = applyConstraints(xy, circleID);
