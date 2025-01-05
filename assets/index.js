@@ -721,7 +721,7 @@ function saveSettings() {
 }
 
 // for electron version only
-if(isElectron()) {
+async function initElectron() {
     gitLink.href = "JavaScript:window.externalLink.open('" + gitLink.href + "');";
     gitLink.target = "_self";
     resultElement.addEventListener("contextmenu", window.electronAPI.showContextMenu);
@@ -735,6 +735,11 @@ if(isElectron()) {
         language: tesseractSettings.language
     };
     displaySettings(tesseractSettingsT);
+}
+
+// for electron version only
+if(isElectron()) {
+    initElectron();
 }
 
 init();
