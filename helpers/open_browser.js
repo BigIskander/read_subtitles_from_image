@@ -1,5 +1,8 @@
 var openBrowsers = require('open-browsers');
 
-if (openBrowsers('http://localhost:3000')) {
+if(process.env.VITE == 'true') var port = 5173
+else var port = 3000
+
+if (openBrowsers(`http://localhost:${port}/`)) {
   console.log('The browser tab has been opened!');
 }

@@ -6,6 +6,8 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+// is electron
+import isElectron from 'is-electron';
 
 // backend server host
 const server_host = import.meta.env.PROD ? document.location.origin : "http://localhost:3000";
@@ -31,6 +33,8 @@ var fragmentShaderF, fragmentShaderS;
 var composer;
 
 var canvas = document.querySelector("#main_canvas");
+// canvas.width canvas.height readings inconsistent and wrong sometimes
+const canvasSize = 4096; 
 var canvasWidth = parseInt(window.getComputedStyle(canvas).width); // in pixels
 var canvasHeight = parseInt(window.getComputedStyle(canvas).height); // in pixels
 var clearColor = 0x333333;
@@ -68,6 +72,7 @@ var resultStatusElement = document.querySelector("#results_status");
 resultElement.value = "";
 // to handle file drops
 var fileChooserElement = document.querySelector("#file_choser");
+var gitLink = document.querySelector("#gitLink");
 
 async function init() {
     camera = new THREE.Camera();
@@ -152,8 +157,8 @@ async function init() {
 
     // postprocessing
     // filter shader
-    vertexShader = await load_shader("/assets/shader.vert");
-    fragmentShaderF = await load_shader("/assets/shader.frag");
+    vertexShader = await load_shader("./assets/shader.vert");
+    fragmentShaderF = await load_shader("./assets/shader.frag");
     // Filter by color material
     var materialF = new THREE.ShaderMaterial({
         uniforms: {
@@ -545,8 +550,8 @@ function applySubtitlesColor() {
 
 // convert coordinates
 function relativeToPixel(xy) {
-    xy.x = parseInt(circleMeshRadius + (canvas.width * ((1.0 + xy.x) / 2.0)));
-    xy.y = parseInt(circleMeshRadius + (canvas.height * ((1.0 + xy.y) / 2.0)));
+    xy.x = parseInt(circleMeshRadius + (canvasSize * ((1.0 + xy.x) / 2.0)));
+    xy.y = parseInt(circleMeshRadius + (canvasSize * ((1.0 + xy.y) / 2.0)));
     return xy;
 }
 
@@ -600,7 +605,8 @@ async function recognizeText() {
         } else {
             var text = getResult.data;
             text.replace(/(?:\r\n|\r|\n|\t)/g, ' ').replace(/(?:\s\s+)/g, ' ').trim();
-            resultElement.value = text;
+            // slice(0, -1) to delete last unprintable character or symbol
+            resultElement.value = text.slice(0, -1);
             resultStatusElement.innerHTML = "";
         }
     } catch (error) {
@@ -612,7 +618,7 @@ async function recognizeText() {
 }
 
 // request data from backend server
-function recognizeTextRequest(base64image) {
+function recognizeTextRequestExpress(base64image) {
     return new Promise(async (resolve, reject) => {
         try {
             var response = await fetch(server_host + "/recognize", {
@@ -630,6 +636,23 @@ function recognizeTextRequest(base64image) {
             reject(error);
         }
     });
+}
+
+// request data from backend electron
+function recognizeTextRequestElectron(base64image) {
+    return new Promise(async (resolve, reject) => {
+        resolve(await window.tesseractOCR.recognize(base64image));
+    });
+}
+
+const recognizeTextRequest = isElectron() ? 
+                                recognizeTextRequestElectron : recognizeTextRequestExpress;
+
+
+if(isElectron()) {
+    gitLink.href = "JavaScript:window.externalLink.open('" + gitLink.href + "');";
+    gitLink.target = "_self";
+    resultElement.addEventListener("contextmenu", window.electronAPI.showContextMenu);
 }
 
 init();
