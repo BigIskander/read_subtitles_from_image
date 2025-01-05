@@ -19,5 +19,8 @@
   "homepage": "https://github.com/BigIskander/read_subtitles_from_image#readme",
   "devDependencies": {
     "electron": "^33.2.1"
+  },
+  "dependencies": {
+    "node-persist": "^4.0.3"
   }
 }

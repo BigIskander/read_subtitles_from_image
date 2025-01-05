@@ -1,7 +1,7 @@
-const { app, BrowserWindow, Menu, ipcMain } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron');
 const path = require('path');
 
-const preload = path.join(__dirname, 'preload.js')
+const preload = path.join(__dirname, 'preload.js');
 
 const createWindow = () => {
   const win = new BrowserWindow({
@@ -34,9 +34,23 @@ const createWindow = () => {
   ipcMain.on('show-context-menu', (event) => {
     const template = [
       { role: 'copy', label: 'Копировать' }
-    ]
+    ];
     const menu = Menu.buildFromTemplate(template);
-    menu.popup(BrowserWindow.fromWebContents(event.sender))
+    menu.popup(BrowserWindow.fromWebContents(event.sender));
+  });
+  ipcMain.on('show-context-menu2', (event) => {
+    const template = [
+      { role: 'cut', label: 'Вырезать' },
+      { role: 'copy', label: 'Копировать' },
+      { role: 'paste', label: 'Вставить' }
+    ];
+    const menu = Menu.buildFromTemplate(template);
+    menu.popup(BrowserWindow.fromWebContents(event.sender));
+  });
+
+  //Chosing the directory
+  ipcMain.handle('choose-directory', async () => {
+    return dialog.showOpenDialogSync(win, { properties: ['openDirectory']});
   });
 }
 

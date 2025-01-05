@@ -72,7 +72,16 @@ var resultStatusElement = document.querySelector("#results_status");
 resultElement.value = "";
 // to handle file drops
 var fileChooserElement = document.querySelector("#file_choser");
+// for electron version only
 var gitLink = document.querySelector("#gitLink");
+var setting = document.querySelector("#settings");
+var settingsSet = document.querySelector("#settings_set");
+var settingsSH = document.querySelector("#settings_show_hide");
+var tesseractPath = document.querySelector("#tesseract_path");
+var tessdatadir = document.querySelector("#tessdatadir");
+var language = document.querySelector("#tesseract_language");
+var tesseractSettings;
+var tesseractSettingsT;
 
 async function init() {
     camera = new THREE.Camera();
@@ -649,10 +658,83 @@ const recognizeTextRequest = isElectron() ?
                                 recognizeTextRequestElectron : recognizeTextRequestExpress;
 
 
+// for electron version only
+function copySettings(from, to) {
+    to.tesseractPath = from.tesseractPath;
+    to.tessdatadir = from.tessdatadir;
+    to.language = from.language;
+}
+
+// for electron version only
+function displaySettings(settingS) {
+    tesseractPath.innerHTML = settingS.tesseractPath == null ? "empty value" : settingS.tesseractPath;
+    tessdatadir.innerHTML = settingS.tessdatadir == null ? "empty value" : settingS.tessdatadir;
+    language.value = settingS.language;
+}
+
+// for electron version only
+function settingsShowHide() {
+    if(settingsSet.style.display == "none" || settingsSet.style.display == "") {
+        settingsSet.style.display = "block";
+        settingsSH.innerHTML = "hide";
+    } else {
+        settingsSet.style.display = "none";
+        settingsSH.innerHTML = "show";
+        copySettings(tesseractSettings, tesseractSettingsT);
+        displaySettings(tesseractSettingsT);
+    }
+}
+
+// for electron version only
+async function choseFolder(isTesseractPath = true) {
+    var folder = await window.tesseractOCR.choseFolder();
+    if(folder) {
+        if(isTesseractPath) 
+            tesseractSettingsT.tesseractPath = folder[0];
+        else 
+            tesseractSettingsT.tessdatadir = folder[0];
+        displaySettings(tesseractSettingsT);
+    }
+}
+
+// for electron version only
+function clearFolder(isTesseractPath = true) {
+    if(isTesseractPath)
+        tesseractSettingsT.tesseractPath = null;
+    else
+        tesseractSettingsT.tessdatadir = null;
+    displaySettings(tesseractSettingsT);
+}
+
+// for electron version only
+function languageUpdated() {
+    tesseractSettingsT.language = language.value;
+}
+
+// for electron version only
+function saveSettings() {
+    if(tesseractSettingsT.language != language.value) 
+        languageUpdated();
+    copySettings(tesseractSettingsT, tesseractSettings);
+    window.tesseractOCR.saveSettings(tesseractSettings);
+    alert("Settings saved.");
+}
+
+// for electron version only
 if(isElectron()) {
     gitLink.href = "JavaScript:window.externalLink.open('" + gitLink.href + "');";
     gitLink.target = "_self";
     resultElement.addEventListener("contextmenu", window.electronAPI.showContextMenu);
+    setting.style.display = "block";
+    settingsSH.addEventListener("click", settingsShowHide);
+    language.addEventListener("contextmenu", window.electronAPI.showContextMenu2);
+    tesseractSettings = await window.tesseractOCR.initSettings();
+    tesseractSettingsT = {
+        tesseractPath: tesseractSettings.tesseractPath,
+        tessdatadir: tesseractSettings.tessdatadir,
+        language: tesseractSettings.language
+    };
+    displaySettings(tesseractSettingsT);
 }
 
 init();
@@ -663,7 +745,11 @@ export {
     clearCanvas,
     applySubtitlesColor,
     pickSubtitlesColor,
-    recognizeText
+    recognizeText,
+    choseFolder,
+    clearFolder,
+    languageUpdated,
+    saveSettings
 }
 
 // dinamic line geometry example
