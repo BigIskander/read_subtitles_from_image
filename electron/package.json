@@ -5,6 +5,11 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "build": "electron-builder",
+    "build_win": "npm run build_win_ia32 && npm run build_win_x64 && npm run build_win_arm64",
+    "build_win_ia32": "electron-builder --ia32 --win && bash rename_exe.sh ia32",
+    "build_win_x64": "electron-builder --x64 --win && bash rename_exe.sh x64",
+    "build_win_arm64": "electron-builder --arm64 --win && bash rename_exe.sh arm64",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,9 +23,56 @@
   },
   "homepage": "https://github.com/BigIskander/read_subtitles_from_image#readme",
   "devDependencies": {
-    "electron": "^33.2.1"
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8"
   },
   "dependencies": {
     "node-persist": "^4.0.3"
+  },
+  "build": {
+    "appId": "org.xuexihanzijs.desktop.app",
+    "files": [
+      "main.js",
+      "preload.js",
+      {
+        "from": "../dist",
+        "to": "static",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis"
+        }
+      ]
+    },
+    "mac": {
+      "category": "public.app-category.education",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ]
+    },
+    "linux": {
+      "category": "Education",
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64",
+            "armv7l",
+            "arm64"
+          ]
+        }
+      ]
+    }
   }
 }

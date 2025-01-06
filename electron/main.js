@@ -2,6 +2,7 @@ const { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron');
 const path = require('path');
 
 const preload = path.join(__dirname, 'preload.js');
+const indexHTML = path.join(__dirname, 'static/index.html');
 
 const createWindow = () => {
   const win = new BrowserWindow({
@@ -18,7 +19,7 @@ const createWindow = () => {
   if(process.env.DEV == 'true') { 
     win.loadURL('http://localhost:5173');
   } else {
-    //win.loadFile('../dist/index.html');
+    win.loadFile(indexHTML);
   }
 
   win.maximize();
