@@ -4,7 +4,8 @@ const path = require('path');
 const storage = require('node-persist');
 const os = require('os');
 const storageDir = path.join(os.homedir() + "/.read_subtitles_from_image_electron");
-import fixPath from "fix-path";
+// import fixPath from 'fix-path';
+const fixPath = (...args) => import('fix-path').then(({default: fixPath}) => fixPath(...args));
 //Fix for mac OS and Linux
 fixPath();
 
@@ -81,3 +82,6 @@ contextBridge.exposeInMainWorld('tesseractOCR', {
     },
     choseFolder: () => { return ipcRenderer.invoke('choose-directory'); }
 });
+
+// a little trick to load ES module in commonJS
+// https://stackoverflow.com/questions/70541068/instead-change-the-require-of-index-js-to-a-dynamic-import-which-is-available
