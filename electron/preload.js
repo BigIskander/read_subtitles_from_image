@@ -43,6 +43,12 @@ contextBridge.exposeInMainWorld('tesseractOCR', {
         var tesseractProcess = childProcess.spawn(tesseract, commandArgs);
         const prom = new Promise(async (resolve) => {
             tesseractProcess.on('error', (err) => { resolve({ err: err.toString(), data: "" }); });
+            tesseractProcess.on('close', (code) => { 
+                if(code == 0) 
+                    resolve({ err: "", data: "" }); 
+                else
+                    resolve({ err: "tesseract closed with status: " + code, data: "" });
+            });
             tesseractProcess.stdout.on('data', function (data) {
                 resolve({ err: "", data: data.toString() });
             });
