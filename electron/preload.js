@@ -4,6 +4,9 @@ const path = require('path');
 const storage = require('node-persist');
 const os = require('os');
 const storageDir = path.join(os.homedir() + "/.read_subtitles_from_image_electron");
+import fixPath from "fix-path";
+//Fix for mac OS and Linux
+fixPath();
 
 const allowedURLs = [
     'https://github.com/BigIskander/read_subtitles_from_image'
