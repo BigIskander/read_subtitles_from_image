@@ -4,8 +4,10 @@ const path = require('path');
 const preload = path.join(__dirname, 'preload.js');
 const indexHTML = path.join(__dirname, 'static/index.html');
 
+var win;
+
 const createWindow = () => {
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     width: 800,
     height: 600,
     minWidth: 800,
@@ -49,11 +51,12 @@ const createWindow = () => {
     menu.popup(BrowserWindow.fromWebContents(event.sender));
   });
 
-  //Chosing the directory
-  ipcMain.handle('choose-directory', async () => {
-    return dialog.showOpenDialogSync(win, { properties: ['openDirectory']});
-  });
 }
+
+//Chosing the directory
+ipcMain.handle('choose-directory', async () => {
+  return dialog.showOpenDialogSync(win, { properties: ['openDirectory']});
+});
 
 // start the app and allow only one copy of app running
 // https://stackoverflow.com/questions/35916158/how-to-prevent-multiple-instances-in-electron
