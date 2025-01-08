@@ -80,6 +80,7 @@ var settingsSH = document.querySelector("#settings_show_hide");
 var tesseractPath = document.querySelector("#tesseract_path");
 var tessdatadir = document.querySelector("#tessdatadir");
 var language = document.querySelector("#tesseract_language");
+var psm = document.querySelector("#psm");
 var tesseractSettings;
 var tesseractSettingsT;
 
@@ -564,6 +565,29 @@ function relativeToPixel(xy) {
     return xy;
 }
 
+function showPsmHelp() {
+    alert("\
+        psm values explained: \n\ \n\
+        0    Orientation and script detection (OSD) only. \n\
+        1    Automatic page segmentation with OSD \n\
+        2    Automatic page segmentation, but no OSD, or OCR. \n\
+            (not implemented) \n\
+        3    Fully automatic page segmentation, but no OSD. (Default) \n\
+        4    Assume a single column of text of variable sizes. \n\
+        5    Assume a single uniform block of vertically aligned text. \n\
+        6    Assume a single uniform block of text. \n\
+        7    Treat the image as a single text line. \n\
+        8    Treat the image as a single word. \n\
+        9    Treat the image as a single word in a circle. \n\
+        10    Treat the image as a single character. \n\
+        11    Sparse text. Find as much text as possible \n\
+            in no particular order. \n\
+        12    Sparse text with OSD. \n\
+        13    Raw line. Treat the image as a single text line, \n\
+            bypassing hacks that are Tesseract-specific. \
+    "); 
+}
+
 async function recognizeText() {
     resultStatusElement.style.color = "#00ff00";
     resultStatusElement.innerHTML = "In progress..."
@@ -602,10 +626,11 @@ async function recognizeText() {
     ctx.putImageData(imageData, 0, 0, 0, 0, width, height);
     // testImage.src = imageCanvas.toDataURL("image/png");
     var base64image = imageCanvas.toDataURL("image/png");
+    var psmValue = psm.value;
 
     try {
         // Call to backend and display reselts
-        var getResult = await recognizeTextRequest(base64image);
+        var getResult = await recognizeTextRequest(base64image, psmValue);
         if(getResult.err != "") {
             resultStatusElement.style.color = "#ff0000";
             resultStatusElement.innerHTML = "An error occurred.";
@@ -627,13 +652,14 @@ async function recognizeText() {
 }
 
 // request data from backend server
-function recognizeTextRequestExpress(base64image) {
+function recognizeTextRequestExpress(base64image, psmValue) {
     return new Promise(async (resolve, reject) => {
         try {
             var response = await fetch(server_host + "/recognize", {
                 method: "POST",
                 body: JSON.stringify({
                   base64image: base64image,
+                  psmValue: psmValue
                 }),
                 headers: {
                   "Content-type": "application/json; charset=UTF-8"
@@ -648,9 +674,9 @@ function recognizeTextRequestExpress(base64image) {
 }
 
 // request data from backend electron
-function recognizeTextRequestElectron(base64image) {
+function recognizeTextRequestElectron(base64image, psmValue) {
     return new Promise(async (resolve, reject) => {
-        resolve(await window.tesseractOCR.recognize(base64image));
+        resolve(await window.tesseractOCR.recognize(base64image, psmValue));
     });
 }
 
@@ -750,6 +776,7 @@ export {
     clearCanvas,
     applySubtitlesColor,
     pickSubtitlesColor,
+    showPsmHelp,
     recognizeText,
     choseFolder,
     clearFolder,

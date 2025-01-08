@@ -27,10 +27,12 @@ app.use(express.static('dist'));
 // get a post request with image data
 app.post('/recognize', cors(corsOptions), async (req, res) => {
   var imageDataUrl = req.body.base64image;
+  var psmValue = parseInt(req.body.psmValue);
+  psmValue = (0 <= psmValue && psmValue <= 13) ? psmValue : 3;
   var imageBuffer = Buffer.from(imageDataUrl.split('base64,')[1], 'base64');
   // run tesseract
   var tesseract = "tesseract";
-  var commandArgs = ["-l", lang, "--dpi", "96", "--oem", "3", "-", "stdout"];
+  var commandArgs = ["-l", lang, "--dpi", "96", "--psm", psmValue, "--oem", "3", "-", "stdout"];
   var tesseractProcess = childProcess.spawn(tesseract, commandArgs);
   // get results
   var result = await new Promise(async (resolve) => {
@@ -59,7 +61,6 @@ app.listen(port, () => {
   console.log("read_subtitles_from_image");
   console.log(`The application is listening on port ${port}`);
   console.log(`http://localhost:${port}/`);
-  console.log("The change.");
 });
 
 // cors

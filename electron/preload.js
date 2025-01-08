@@ -32,10 +32,12 @@ var tesseractPath = null;
 
 // tesseract OCR
 contextBridge.exposeInMainWorld('tesseractOCR', {
-    recognize: (imageDataUrl) => {
+    recognize: (imageDataUrl, psmValue) => {
         const imageBuffer = Buffer.from(imageDataUrl.split('base64,')[1], 'base64');
         var tesseract = tesseractPath ? path.join(tesseractPath, "tesseract") : "tesseract";
-        var commandArgs = ["-l", language, "--dpi", "96", "--oem", "3", "-", "stdout"];
+        psmValue = parseInt(psmValue);
+        psmValue = (0 <= psmValue && psmValue <= 13) ? psmValue : 3;
+        var commandArgs = ["-l", language, "--dpi", "96", "--psm", psmValue, "--oem", "3", "-", "stdout"];
         if(tessdatadir) {
             commandArgs.splice(0, 0, "--tessdata-dir");
             commandArgs.splice(1, 0, tessdatadir);

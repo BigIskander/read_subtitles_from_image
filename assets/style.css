@@ -43,6 +43,12 @@ body {
     margin-left: 2%;
     margin-right: 2%;
 }
+#psm_choser {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 2%;
+    margin-right: 2%;
+}
 #subtitles_color {
     background-color: rgba(255, 255, 255, 255);
     color: rgba(0, 0, 0, 255);

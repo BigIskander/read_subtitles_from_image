@@ -11,6 +11,7 @@
       var clearCanvas;
       var applySubtitlesColor;
       var pickSubtitlesColor;
+      var showPsmHelp;
       var recognizeText;
       var choseFolder;
       var clearFolder;
@@ -25,6 +26,7 @@
         clearCanvas = main.clearCanvas;
         applySubtitlesColor = main.applySubtitlesColor;
         pickSubtitlesColor = main.pickSubtitlesColor;
+        showPsmHelp = main.showPsmHelp;
         recognizeText = main.recognizeText;
         choseFolder = main.choseFolder;
         clearFolder = main.clearFolder;
@@ -51,6 +53,25 @@
       Filter by color: <input id="apply_filter" type="checkbox" onchange="applySubtitlesColor();">
       Subtitles color: <em id="subtitles_color">rgba(255, 255, 255, 255)</em>
       <a href="JavaScript:void(0);" onclick="pickSubtitlesColor();">Pick subtitles color.</a>
+    </div>
+    <div id="psm_choser">
+      psm: 
+      <select id="psm">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3" selected>3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
+        <option value="11">11</option>
+        <option value="12">12</option>
+        <option value="13">13</option>
+      </select>
+      (<a href="JavaScript:void(0);" onclick="showPsmHelp()">?</a>)
     </div>
     <div id="bottom_buttons">
       <a href="JavaScript:void(0);" onclick="recognizeText();">Recognize selected text.</a>
