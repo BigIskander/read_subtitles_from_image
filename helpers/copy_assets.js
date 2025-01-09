@@ -11,3 +11,7 @@ let data = fs.readFileSync('./dist/index.html', 'utf8');
 data = data.replaceAll('src="/', 'src="./');
 data = data.replaceAll('href="/', 'href="./');
 fs.writeFileSync('./dist/index.html', data);
+
+// favicon.ico
+if(fs.existsSync("./dist/assets/favicon.ico")) fs.unlinkSync("./dist/assets/favicon.ico");
+fs.copyFileSync("./favicon.ico", "./dist/favicon.ico");
