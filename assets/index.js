@@ -164,7 +164,7 @@ async function init() {
         canvas: canvas
     });
     renderer.setClearColor(clearColor);
-    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setViewport(0, 0, canvasSize, canvasSize);
 
     // postprocessing
     // filter shader
