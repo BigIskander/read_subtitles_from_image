@@ -14,6 +14,7 @@ const server_host = import.meta.env.PROD ? document.location.origin : "http://lo
 
 var camera, scene, renderer, clock, renderTarget, renderTargetF, sceneRTT, sceneRTTF;
 var clicked = false;
+var isInit = false;
 
 function load_shader(file_url) {
     return new Promise(async (resolve, reject) => {
@@ -203,6 +204,7 @@ async function init() {
     applyFilter.checked = false; 
     resultStatusElement.style.color = "#00ff00";
 
+    isInit = true;
     render();
 }
 
@@ -403,6 +405,9 @@ function onMouseLeave(event) {
 }
 
 function render(postponed = false) {
+    // fixing race condition issue
+    if(!isInit) return;
+    //
     var deltaTime = clock.getDelta();
     if(!postponed && postponedFrame) return;
     if(deltaTime > frameTime || postponed) {
