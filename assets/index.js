@@ -388,10 +388,13 @@ function onCanvasMouseUp(event) {
         return;
     }
     // usual mode
+    var isInCircle = false;
     for(let i = 0; i < 4; i++) {
         clicked[i] = false;
+        if(isWithinCircle(event, i)) isInCircle = true;
     }
-    canvas.style.cursor = 'default';
+    if(isInCircle) canvas.style.cursor = 'pointer';
+    else canvas.style.cursor = 'default';
 }
 
 function onMouseLeave(event) {
