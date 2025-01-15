@@ -22,7 +22,7 @@ https://github.com/user-attachments/assets/6d610ada-971e-4d68-a9fd-2eb6c52160c4
 
 ## Как установить и настроить
 
-Вы можете найти уже скомпилированные бинарные (установочные) файлы с программой на странице релизов ([releases](releases)).
+Вы можете найти уже скомпилированные бинарные (установочные) файлы с программой на странице релизов ([releases](https://github.com/BigIskander/read_subtitles_from_image/releases)).
 
 Программа доступна для операционных системм Linux, Windows и macOS.
 

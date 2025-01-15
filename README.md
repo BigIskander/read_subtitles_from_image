@@ -22,7 +22,7 @@ For video demonstration I used print screen made from the show [The Beauty Blogg
 
 ## How to install and set up
 
-You can find compiled binaries (installation files) with program in [releases](releases) page.
+You can find compiled binaries (installation files) with program in [releases](https://github.com/BigIskander/read_subtitles_from_image/releases) page.
 
 The program is available for operating systems Linux, Windows and macOS.
 
