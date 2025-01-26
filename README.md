@@ -28,6 +28,8 @@ The program is available for operating systems Linux, Windows and macOS.
 
 In order for program to work you also need to install [tesseract-ocr](https://tesseract-ocr.github.io/) and add [.traineddata](https://github.com/tesseract-ocr/tessdata) files (with pretrained data to recognize the text).
 
+**Note:** I would recommend to install tesseract 4 (instead of tesseract 5). Because the results is the most accurate when using with tesseract 4 (at least for recognition of text in Chinese language).
+
 Then in the settings of the program set up folder where tesseract is located and folder where .traineddata files are located. Or as alternative you can add these folders to PATH variable of your operating system. Then you need to set up language of recognizing text.
 
 By default language is set up as chi_all, .traineddata file for which, can be donwnloaded from: https://github.com/gumblex/tessdata_chi (file chi_all.traineddata)
