@@ -17,6 +17,7 @@
       var clearFolder;
       var languageUpdated;
       var saveSettings;
+      var changeOcr;
     </script>
     <script type="module" defer>
       (async () => {
@@ -32,6 +33,7 @@
         clearFolder = main.clearFolder;
         languageUpdated = main.languageUpdated;
         saveSettings = main.saveSettings;
+        changeOcr = main.changeOcr;
       })();
     </script>
   </head>
@@ -56,9 +58,9 @@
     </div>
     <div id="ocr_chooser">
       OCR engine:
-      <select id="ocr">
-        <option value="1">Tesseract OCR</option>
-        <option value="2">PaddleOCR</option>
+      <select id="ocr" onchange="changeOcr()">
+        <option value="TesseractOCR">Tesseract OCR</option>
+        <option value="PaddleOCR">PaddleOCR</option>
       </select>
     </div>
     <div id="psm_choser">

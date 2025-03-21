@@ -15,6 +15,7 @@ const server_host = import.meta.env.PROD ? document.location.origin : "http://lo
 var camera, scene, renderer, clock, renderTarget, renderTargetF, sceneRTT, sceneRTTF;
 var clicked = false;
 var isInit = false;
+var usePaddleOcr = false;
 
 function load_shader(file_url) {
     return new Promise(async (resolve, reject) => {
@@ -73,6 +74,10 @@ var resultStatusElement = document.querySelector("#results_status");
 resultElement.value = "";
 // to handle file drops
 var fileChooserElement = document.querySelector("#file_choser");
+// PaddleOCR
+var ocrSelect = document.querySelector("#ocr");
+var tesseractOcrPsmChoser = document.querySelector("#psm_choser");
+var paddleOcrLangChoser = document.querySelector("#paddle_ocr_lang_choser");
 // for electron version only
 var gitLink = document.querySelector("#gitLink");
 var setting = document.querySelector("#settings");
@@ -573,6 +578,19 @@ function relativeToPixel(xy) {
     return xy;
 }
 
+// change OCR engine
+function changeOcr() {
+    if(ocr.value == "PaddleOCR") {
+        usePaddleOcr = true;
+        tesseractOcrPsmChoser.style.display = "none";
+        paddleOcrLangChoser.style.display = "block"; 
+    } else {
+        usePaddleOcr = false;
+        tesseractOcrPsmChoser.style.display = "block";
+        paddleOcrLangChoser.style.display = "none";
+    }
+}
+
 function showPsmHelp() {
     alert("\
         psm values explained: \n\ \n\
@@ -784,6 +802,7 @@ export {
     clearCanvas,
     applySubtitlesColor,
     pickSubtitlesColor,
+    changeOcr,
     showPsmHelp,
     recognizeText,
     choseFolder,
