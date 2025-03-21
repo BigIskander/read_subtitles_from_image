@@ -580,7 +580,7 @@ function relativeToPixel(xy) {
 
 // change OCR engine
 function changeOcr() {
-    if(ocr.value == "PaddleOCR") {
+    if(ocrSelect.value == "PaddleOCR") {
         usePaddleOcr = true;
         tesseractOcrPsmChoser.style.display = "none";
         paddleOcrLangChoser.style.display = "block"; 
