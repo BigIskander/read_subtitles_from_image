@@ -43,7 +43,19 @@ body {
     margin-left: 2%;
     margin-right: 2%;
 }
+#ocr_chooser {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 2%;
+    margin-right: 2%;
+}
 #psm_choser {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 2%;
+    margin-right: 2%;
+}
+#paddle_ocr_lang_choser {
     margin-top: 5px;
     margin-bottom: 5px;
     margin-left: 2%;

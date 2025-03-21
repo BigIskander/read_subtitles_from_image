@@ -54,6 +54,13 @@
       Subtitles color: <em id="subtitles_color">rgba(255, 255, 255, 255)</em>
       <a href="JavaScript:void(0);" onclick="pickSubtitlesColor();">Pick subtitles color.</a>
     </div>
+    <div id="ocr_chooser">
+      OCR engine:
+      <select id="ocr">
+        <option value="1">Tesseract OCR</option>
+        <option value="2">PaddleOCR</option>
+      </select>
+    </div>
     <div id="psm_choser">
       psm: 
       <select id="psm">
@@ -72,6 +79,14 @@
         <option value="13">13</option>
       </select>
       (<a href="JavaScript:void(0);" onclick="showPsmHelp()">?</a>)
+    </div>
+    <div id="paddle_ocr_lang_choser">
+      language:
+      <select>
+        <option value="ch">Chinese and English</option>
+        <option value="en">English</option>
+        <option value="ch_tra">Chinese traditional</option>
+      </select>
     </div>
     <div id="bottom_buttons">
       <a href="JavaScript:void(0);" onclick="recognizeText();">Recognize selected text.</a>
