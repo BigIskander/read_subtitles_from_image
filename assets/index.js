@@ -81,6 +81,7 @@ var paddleOcrLangList = ["no", "ch", "en", "ch_tra", "test"];
 var ocrSelect = document.querySelector("#ocr");
 var tesseractOcrPsmChoser = document.querySelector("#psm_choser");
 var paddleOcrLangChoser = document.querySelector("#paddle_ocr_lang_choser");
+var paddleOcrLangChoserSelect = document.querySelector("#paddle_ocr_lang_choser_select");
 // for electron version only
 var gitLink = document.querySelector("#gitLink");
 var setting = document.querySelector("#settings");
@@ -797,7 +798,10 @@ function initPaddleOCR() {
     const keys = Object.keys(paddleOcrLangs);
     for(const lang of paddleOcrLangList) {
         if(keys.includes(lang)) {
-            console.log(paddleOcrLangs[lang]);
+            var option = document.createElement("option");
+            option.value = lang;
+            option.innerText = paddleOcrLangs[lang];
+            paddleOcrLangChoserSelect.append(option);
         }
     }
 }
