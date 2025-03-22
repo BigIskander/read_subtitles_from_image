@@ -8,6 +8,8 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 // is electron
 import isElectron from 'is-electron';
+// paddleOcrLangs
+import { paddleOcrLangs } from './paddleOcrLangsList';
 
 // backend server host
 const server_host = import.meta.env.PROD ? document.location.origin : "http://localhost:3000";
@@ -75,6 +77,7 @@ resultElement.value = "";
 // to handle file drops
 var fileChooserElement = document.querySelector("#file_choser");
 // PaddleOCR
+var paddleOcrLangList = ["no", "ch", "en", "ch_tra", "test"];
 var ocrSelect = document.querySelector("#ocr");
 var tesseractOcrPsmChoser = document.querySelector("#psm_choser");
 var paddleOcrLangChoser = document.querySelector("#paddle_ocr_lang_choser");
@@ -788,6 +791,17 @@ async function initElectron() {
     };
     displaySettings(tesseractSettingsT);
 }
+
+// PaddleOCR init
+function initPaddleOCR() {
+    const keys = Object.keys(paddleOcrLangs);
+    for(const lang of paddleOcrLangList) {
+        if(keys.includes(lang)) {
+            console.log(paddleOcrLangs[lang]);
+        }
+    }
+}
+initPaddleOCR();
 
 // for electron version only
 if(isElectron()) {
