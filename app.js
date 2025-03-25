@@ -50,16 +50,24 @@ async function recognizeTesseractOcr(imageBuffer, lang, psmValue) {
   return result;
 }
 
+async function recognizePaddleOcr(imageBuffer, lang) {
+  return { err: "", data: "not implemented yet" };
+}
+
 // get a post request with image data
 app.post('/recognize', cors(corsOptions), async (req, res) => {
   console.log(req.body);
+  var usePaddleOcr = req.body.usePaddleOcr;
   var imageDataUrl = req.body.base64image;
   var lang = req.body.lang;
   var psmValue = parseInt(req.body.psmValue);
   psmValue = (0 <= psmValue && psmValue <= 13) ? psmValue : 3;
   var imageBuffer = Buffer.from(imageDataUrl.split('base64,')[1], 'base64');
   // get results
-  var result = await recognizeTesseractOcr(imageBuffer, lang, psmValue);
+  if(usePaddleOcr) 
+    var result = await recognizePaddleOcr(imageBuffer, lang);
+  else
+    var result = await recognizeTesseractOcr(imageBuffer, lang, psmValue);
   // return results to frontend
   res.send(JSON.stringify(result));
 });
