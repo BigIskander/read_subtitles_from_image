@@ -24,13 +24,7 @@ if(process.env.DEV == 'true') {
 // serve static pages built with vite and three.js
 app.use(express.static('dist'));
 
-// get a post request with image data
-app.post('/recognize', cors(corsOptions), async (req, res) => {
-  console.log(req.body);
-  var imageDataUrl = req.body.base64image;
-  var psmValue = parseInt(req.body.psmValue);
-  psmValue = (0 <= psmValue && psmValue <= 13) ? psmValue : 3;
-  var imageBuffer = Buffer.from(imageDataUrl.split('base64,')[1], 'base64');
+async function recognizeTesseractOcr(imageBuffer, lang, psmValue) {
   // run tesseract
   var tesseract = "tesseract";
   var commandArgs = ["-l", lang, "--dpi", "96", "--psm", psmValue, "--oem", "3", "-", "stdout"];
@@ -53,6 +47,19 @@ app.post('/recognize', cors(corsOptions), async (req, res) => {
     tesseractProcess.stdin.write(imageBuffer);
     tesseractProcess.stdin.end();
   });
+  return result;
+}
+
+// get a post request with image data
+app.post('/recognize', cors(corsOptions), async (req, res) => {
+  console.log(req.body);
+  var imageDataUrl = req.body.base64image;
+  var lang = req.body.lang;
+  var psmValue = parseInt(req.body.psmValue);
+  psmValue = (0 <= psmValue && psmValue <= 13) ? psmValue : 3;
+  var imageBuffer = Buffer.from(imageDataUrl.split('base64,')[1], 'base64');
+  // get results
+  var result = await recognizeTesseractOcr(imageBuffer, lang, psmValue);
   // return results to frontend
   res.send(JSON.stringify(result));
 });
