@@ -4,7 +4,12 @@ const bodyParser = require('body-parser')
 const childProcess = require('child_process');
 const app = express();
 const port = process.env.PORT || 3000;
-const lang = process.env.TESSLANG || "chi_all";
+const langs = process.env.TESSLANGS ? 
+  process.env.TESSLANGS.split(";").filter(item => item!="")
+  : ["chi_all", "eng"];
+const langsPaddle = process.env.PADDLELANGS ?
+  process.env.PADDLELANGS.split(";").filter(item => item!="")
+  : ["ch", "en", "ch_tra"];
 
 // to parse reqests
 app.use(bodyParser.json({limit: '50mb'}));
@@ -56,18 +61,19 @@ async function recognizePaddleOcr(imageBuffer, lang) {
 
 // get a post request with image data
 app.post('/recognize', cors(corsOptions), async (req, res) => {
-  console.log(req.body);
   var usePaddleOcr = req.body.usePaddleOcr;
   var imageDataUrl = req.body.base64image;
-  var lang = req.body.lang;
-  var psmValue = parseInt(req.body.psmValue);
-  psmValue = (0 <= psmValue && psmValue <= 13) ? psmValue : 3;
   var imageBuffer = Buffer.from(imageDataUrl.split('base64,')[1], 'base64');
   // get results
-  if(usePaddleOcr) 
+  if(usePaddleOcr) {
+    var lang = langsPaddle.includes(req.body.lang) ? req.body.lang : "ch";
     var result = await recognizePaddleOcr(imageBuffer, lang);
-  else
+  } else {
+    var lang = langs.includes(req.body.lang) ? req.body.lang : "chi_all";
+    var psmValue = parseInt(req.body.psmValue);
+    psmValue = (0 <= psmValue && psmValue <= 13) ? psmValue : 3;
     var result = await recognizeTesseractOcr(imageBuffer, lang, psmValue);
+  }
   // return results to frontend
   res.send(JSON.stringify(result));
 });
