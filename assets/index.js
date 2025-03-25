@@ -31,6 +31,18 @@ function load_shader(file_url) {
     });
 }
 
+function load_langs() {
+    return new Promise(async (resolve, reject) => {
+        try {
+            var response = await fetch(server_host + "/langs");
+            if(!response.ok) reject(`Response status: ${response.status}`);
+            resolve(response.text());
+        } catch(error) {
+            reject(error);
+        }
+    });
+}
+
 // filter shader
 var vertexShader;
 var fragmentShaderF, fragmentShaderS;
@@ -79,12 +91,10 @@ var fileChooserElement = document.querySelector("#file_choser");
 // OCR engine
 var ocrSelect = document.querySelector("#ocr");
 // Tesseract OCR
-var tesseractOcrLangList = ["chi_all", "eng"];
 var tesseractOcrLangChoser = document.querySelector("#tesseract_ocr_lang_choser");
 var tesseractOcrLangChoserSelect = document.querySelector("#tesseract_ocr_lang_choser_select");
 var tesseractOcrPsmChoser = document.querySelector("#psm_choser");
 // PaddleOCR
-var paddleOcrLangList = ["ch", "en", "ch_tra"];
 var paddleOcrLangChoser = document.querySelector("#paddle_ocr_lang_choser");
 var paddleOcrLangChoserSelect = document.querySelector("#paddle_ocr_lang_choser_select");
 // for electron version only
@@ -803,19 +813,18 @@ async function initElectron() {
     displaySettings(tesseractSettingsT);
 }
 
-// Tesseract OCR init
-function initTesseractOCR() {
+async function loadLangOptions() {
+    var getLangs = JSON.parse(await load_langs());
+    var tesseractOcrLangList = getLangs.langs;
+    var paddleOcrLangList = getLangs.langsPaddle;
+    // Tesseract OCR
     for(const lang of tesseractOcrLangList) {
         var option = document.createElement("option");
         option.value = lang;
         option.innerText = lang;
         tesseractOcrLangChoserSelect.append(option);
     }
-}
-initTesseractOCR();
-
-// PaddleOCR init
-function initPaddleOCR() {
+    // PaddleOCR
     const keys = Object.keys(paddleOcrLangs);
     for(const lang of paddleOcrLangList) {
         if(keys.includes(lang)) {
@@ -826,7 +835,7 @@ function initPaddleOCR() {
         }
     }
 }
-initPaddleOCR();
+loadLangOptions();
 
 // for electron version only
 if(isElectron()) {

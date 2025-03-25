@@ -29,6 +29,14 @@ if(process.env.DEV == 'true') {
 // serve static pages built with vite and three.js
 app.use(express.static('dist'));
 
+app.get("/langs", cors(corsOptions), async (req, res) => { 
+  res.send(JSON.stringify({
+    langs: langs,
+    langsPaddle: langsPaddle
+  }));
+});
+
+// recognize text using Tesseract OCR
 async function recognizeTesseractOcr(imageBuffer, lang, psmValue) {
   // run tesseract
   var tesseract = "tesseract";
@@ -55,6 +63,7 @@ async function recognizeTesseractOcr(imageBuffer, lang, psmValue) {
   return result;
 }
 
+// recognize text using PaddleOCR
 async function recognizePaddleOcr(imageBuffer, lang) {
   return { err: "", data: "not implemented yet" };
 }
@@ -78,7 +87,7 @@ app.post('/recognize', cors(corsOptions), async (req, res) => {
   res.send(JSON.stringify(result));
 });
 
-// output console
+// start the server and output console
 app.listen(port, () => {
   console.log("read_subtitles_from_image");
   console.log(`The application is listening on port ${port}`);
