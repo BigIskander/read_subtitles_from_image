@@ -663,11 +663,12 @@ async function recognizeText() {
     ctx.putImageData(imageData, 0, 0, 0, 0, width, height);
     // testImage.src = imageCanvas.toDataURL("image/png");
     var base64image = imageCanvas.toDataURL("image/png");
+    var lang = usePaddleOcr ? paddleOcrLangChoserSelect.value : tesseractOcrLangChoserSelect.value;
     var psmValue = psm.value;
 
     try {
         // Call to backend and display reselts
-        var getResult = await recognizeTextRequest(base64image, psmValue);
+        var getResult = await recognizeTextRequest(usePaddleOcr, base64image, lang, psmValue);
         if(getResult.err != "") {
             resultStatusElement.style.color = "#ff0000";
             resultStatusElement.innerHTML = "An error occurred.";
@@ -689,14 +690,16 @@ async function recognizeText() {
 }
 
 // request data from backend server
-function recognizeTextRequestExpress(base64image, psmValue) {
+function recognizeTextRequestExpress(usePaddleOcr, base64image, lang, psmValue) {
     return new Promise(async (resolve, reject) => {
         try {
             var response = await fetch(server_host + "/recognize", {
                 method: "POST",
                 body: JSON.stringify({
-                  base64image: base64image,
-                  psmValue: psmValue
+                    usePaddleOcr: usePaddleOcr,
+                    base64image: base64image,
+                    lang: lang,
+                    psmValue: psmValue
                 }),
                 headers: {
                   "Content-type": "application/json; charset=UTF-8"
@@ -711,7 +714,7 @@ function recognizeTextRequestExpress(base64image, psmValue) {
 }
 
 // request data from backend electron
-function recognizeTextRequestElectron(base64image, psmValue) {
+function recognizeTextRequestElectron(usePaddleOcr, base64image, lang, psmValue) {
     return new Promise(async (resolve, reject) => {
         resolve(await window.tesseractOCR.recognize(base64image, psmValue));
     });

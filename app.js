@@ -26,6 +26,7 @@ app.use(express.static('dist'));
 
 // get a post request with image data
 app.post('/recognize', cors(corsOptions), async (req, res) => {
+  console.log(req.body);
   var imageDataUrl = req.body.base64image;
   var psmValue = parseInt(req.body.psmValue);
   psmValue = (0 <= psmValue && psmValue <= 13) ? psmValue : 3;
