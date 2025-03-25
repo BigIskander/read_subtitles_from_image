@@ -76,10 +76,15 @@ var resultStatusElement = document.querySelector("#results_status");
 resultElement.value = "";
 // to handle file drops
 var fileChooserElement = document.querySelector("#file_choser");
-// PaddleOCR
-var paddleOcrLangList = ["no", "ch", "en", "ch_tra", "test"];
+// OCR engine
 var ocrSelect = document.querySelector("#ocr");
+// Tesseract OCR
+var tesseractOcrLangList = ["chi_all", "eng"];
+var tesseractOcrLangChoser = document.querySelector("#tesseract_ocr_lang_choser");
+var tesseractOcrLangChoserSelect = document.querySelector("#tesseract_ocr_lang_choser_select");
 var tesseractOcrPsmChoser = document.querySelector("#psm_choser");
+// PaddleOCR
+var paddleOcrLangList = ["ch", "en", "ch_tra"];
 var paddleOcrLangChoser = document.querySelector("#paddle_ocr_lang_choser");
 var paddleOcrLangChoserSelect = document.querySelector("#paddle_ocr_lang_choser_select");
 // for electron version only
@@ -586,10 +591,12 @@ function relativeToPixel(xy) {
 function changeOcr() {
     if(ocrSelect.value == "PaddleOCR") {
         usePaddleOcr = true;
+        tesseractOcrLangChoser.style.display = "none";
         tesseractOcrPsmChoser.style.display = "none";
         paddleOcrLangChoser.style.display = "block"; 
     } else {
         usePaddleOcr = false;
+        tesseractOcrLangChoser.style.display = "block";
         tesseractOcrPsmChoser.style.display = "block";
         paddleOcrLangChoser.style.display = "none";
     }
@@ -792,6 +799,17 @@ async function initElectron() {
     };
     displaySettings(tesseractSettingsT);
 }
+
+// Tesseract OCR init
+function initTesseractOCR() {
+    for(const lang of tesseractOcrLangList) {
+        var option = document.createElement("option");
+        option.value = lang;
+        option.innerText = lang;
+        tesseractOcrLangChoserSelect.append(option);
+    }
+}
+initTesseractOCR();
 
 // PaddleOCR init
 function initPaddleOCR() {

@@ -55,6 +55,12 @@ body {
     margin-left: 2%;
     margin-right: 2%;
 }
+#tesseract_ocr_lang_choser {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 2%;
+    margin-right: 2%;
+}
 #paddle_ocr_lang_choser {
     margin-top: 5px;
     margin-bottom: 5px;
