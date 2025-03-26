@@ -81,12 +81,20 @@ async function recognizePaddleOcr(imageBuffer, lang) {
           resolve({ err: "PaddleOCR, python3 script closed with status: " + code, data: "" });
     });
     paddleProcess.stdout.on('data', function (data) {
-      // TODO: add regex here
-      resolve({ err: "", data: data.toString() });
+      // parse stdout
+      var re = /ppocr\s{0,}INFO:\s{0,}\(\'(?<w>.{0,})\'\,.{0,}\)/;
+      var find = data.toString().match(re);
+      if(find != null) {
+        resolve({ err: "", data: find.groups.w });
+      }
     });
     paddleProcess.stderr.on('data', (err) => {
-      // TODO: add regex here
-      resolve({ err: err.toString(), data: "" });
+      // parse stderr
+      var re = /Error:(?<w>.{0,})/;
+      var find = err.toString().match(re);
+      if(find != null) {
+        resolve({ err: find.groups.w, data: "" });
+      }
     });
     paddleProcess.stdin.write(imageBuffer);
     paddleProcess.stdin.end();

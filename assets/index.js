@@ -682,7 +682,10 @@ async function recognizeText() {
         if(getResult.err != "") {
             resultStatusElement.style.color = "#ff0000";
             resultStatusElement.innerHTML = "An error occurred.";
-            alert("Tesseract OCR error: " + getResult.err);
+            if(usePaddleOcr)
+                alert("PaddleOCR error: " + getResult.err);
+            else
+                alert("Tesseract OCR error: " + getResult.err);
             console.log(getResult.err);
         } else {
             var text = getResult.data;
