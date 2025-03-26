@@ -691,7 +691,7 @@ async function recognizeText() {
             var text = getResult.data;
             // text.replace(/(?:\r\n|\r|\n|\t)/g, ' ').replace(/(?:\s\s+)/g, ' ').trim();
             // slice(0, -1) to delete last unprintable character or symbol
-            resultElement.value = text.slice(0, -1);
+            resultElement.value = usePaddleOcr ? text : text.slice(0, -1);
             resultStatusElement.innerHTML = "";
         }
     } catch (error) {

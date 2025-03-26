@@ -10,7 +10,7 @@ const langs = process.env.TESSLANGS ?
   : ["chi_all", "eng"];
 const langsPaddle = process.env.PADDLELANGS ?
   process.env.PADDLELANGS.split(";").filter(item => item!="")
-  : ["ch", "en", "ch_tra"];
+  : ["ch", "en", "chinese_cht"];
 
 // to parse reqests
 app.use(bodyParser.json({limit: '50mb'}));
