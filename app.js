@@ -85,6 +85,7 @@ async function recognizePaddleOcr(imageBuffer, lang) {
       resolve({ err: "", data: data.toString() });
     });
     paddleProcess.stderr.on('data', (err) => {
+      // TODO: add regex here
       resolve({ err: err.toString(), data: "" });
     });
     paddleProcess.stdin.write(imageBuffer);
