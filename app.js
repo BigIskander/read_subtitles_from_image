@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser')
@@ -65,7 +66,31 @@ async function recognizeTesseractOcr(imageBuffer, lang, psmValue) {
 
 // recognize text using PaddleOCR
 async function recognizePaddleOcr(imageBuffer, lang) {
-  return { err: "", data: "not implemented yet" };
+  // run PaddleOCR
+  var python3 = "python3";
+  var script = path.join(process.cwd(), "run_paddle_ocr.py");
+  var commandArgs = [script, lang];
+  var paddleProcess = childProcess.spawn(python3, commandArgs);
+  // get results
+  var result = await new Promise(async (resolve) => {
+    paddleProcess.on('error', (err) => { resolve({ err: err.toString(), data: "" }); });
+    paddleProcess.on('close', (code) => { 
+      if(code == 0) 
+          resolve({ err: "", data: "" }); 
+      else
+          resolve({ err: "PaddleOCR, python3 script closed with status: " + code, data: "" });
+    });
+    paddleProcess.stdout.on('data', function (data) {
+      // TODO: add regex here
+      resolve({ err: "", data: data.toString() });
+    });
+    paddleProcess.stderr.on('data', (err) => {
+      resolve({ err: err.toString(), data: "" });
+    });
+    paddleProcess.stdin.write(imageBuffer);
+    paddleProcess.stdin.end();
+  });
+  return result;
 }
 
 // get a post request with image data
