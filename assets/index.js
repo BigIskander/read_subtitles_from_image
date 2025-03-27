@@ -194,8 +194,14 @@ async function init() {
 
     // postprocessing
     // filter shader
-    vertexShader = await load_shader("./assets/shader.vert");
-    fragmentShaderF = await load_shader("./assets/shader.frag");
+    try {
+        vertexShader = await load_shader("./assets/shader.vert");
+        fragmentShaderF = await load_shader("./assets/shader.frag");
+    } catch(error) {
+        alert("Failed to load shader, please try to reload the page!\nerror: " + error);
+        console.log(error);
+        return;
+    }
     // Filter by color material
     var materialF = new THREE.ShaderMaterial({
         uniforms: {
@@ -823,7 +829,13 @@ async function initElectron() {
 }
 
 async function loadLangOptions() {
-    var getLangs = JSON.parse(await load_langs());
+    try {
+        var getLangs = JSON.parse(await load_langs());
+    } catch(error) {
+        alert("Failed to get list of languages, please try to reload the page!\nerror: " + error);
+        console.log(error);
+        return;
+    }
     var tesseractOcrLangList = getLangs.langs;
     var paddleOcrLangList = getLangs.langsPaddle;
     // Tesseract OCR
