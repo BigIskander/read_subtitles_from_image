@@ -97,6 +97,8 @@ var tesseractOcrPsmChoser = document.querySelector("#psm_choser");
 // PaddleOCR
 var paddleOcrLangChoser = document.querySelector("#paddle_ocr_lang_choser");
 var paddleOcrLangChoserSelect = document.querySelector("#paddle_ocr_lang_choser_select");
+var paddleOcrMultiline = document.querySelector("#paddle_ocr_multiline");
+var paddleOcrMultilineCheckbox = document.querySelector("#paddle_ocr_multiline_checkbox");
 // for electron version only
 var gitLink = document.querySelector("#gitLink");
 var setting = document.querySelector("#settings");
@@ -604,11 +606,13 @@ function changeOcr() {
         tesseractOcrLangChoser.style.display = "none";
         tesseractOcrPsmChoser.style.display = "none";
         paddleOcrLangChoser.style.display = "block"; 
+        paddleOcrMultiline.style.display = "block";
     } else {
         usePaddleOcr = false;
         tesseractOcrLangChoser.style.display = "block";
         tesseractOcrPsmChoser.style.display = "block";
         paddleOcrLangChoser.style.display = "none";
+        paddleOcrMultiline.style.display = "none";
     }
 }
 
@@ -675,10 +679,11 @@ async function recognizeText() {
     var base64image = imageCanvas.toDataURL("image/png");
     var lang = usePaddleOcr ? paddleOcrLangChoserSelect.value : tesseractOcrLangChoserSelect.value;
     var psmValue = psm.value;
+    var multiline = paddleOcrMultilineCheckbox.checked;
 
     try {
         // Call to backend and display reselts
-        var getResult = await recognizeTextRequest(usePaddleOcr, base64image, lang, psmValue);
+        var getResult = await recognizeTextRequest(usePaddleOcr, base64image, lang, psmValue, multiline);
         if(getResult.err != "") {
             resultStatusElement.style.color = "#ff0000";
             resultStatusElement.innerHTML = "An error occurred.";
@@ -703,7 +708,7 @@ async function recognizeText() {
 }
 
 // request data from backend server
-function recognizeTextRequestExpress(usePaddleOcr, base64image, lang, psmValue) {
+function recognizeTextRequestExpress(usePaddleOcr, base64image, lang, psmValue, multiline) {
     return new Promise(async (resolve, reject) => {
         try {
             var response = await fetch(server_host + "/recognize", {
@@ -712,7 +717,8 @@ function recognizeTextRequestExpress(usePaddleOcr, base64image, lang, psmValue) 
                     usePaddleOcr: usePaddleOcr,
                     base64image: base64image,
                     lang: lang,
-                    psmValue: psmValue
+                    psmValue: psmValue,
+                    multiline: multiline
                 }),
                 headers: {
                   "Content-type": "application/json; charset=UTF-8"

@@ -65,11 +65,12 @@ async function recognizeTesseractOcr(imageBuffer, lang, psmValue) {
 }
 
 // recognize text using PaddleOCR
-async function recognizePaddleOcr(imageBuffer, lang) {
+async function recognizePaddleOcr(imageBuffer, lang, multiline) {
   // run PaddleOCR
   var python3 = "python3";
   var script = path.join(process.cwd(), "run_paddle_ocr.py");
   var commandArgs = [script, lang];
+  if(multiline) commandArgs.push("multiline");
   var paddleProcess = childProcess.spawn(python3, commandArgs);
   // get results
   var output = "";
@@ -115,7 +116,8 @@ app.post('/recognize', cors(corsOptions), async (req, res) => {
   // get results
   if(usePaddleOcr) {
     var lang = langsPaddle.includes(req.body.lang) ? req.body.lang : "ch";
-    var result = await recognizePaddleOcr(imageBuffer, lang);
+    var multiline = Boolean(req.body.multiline);
+    var result = await recognizePaddleOcr(imageBuffer, lang, multiline);
   } else {
     var lang = langs.includes(req.body.lang) ? req.body.lang : "chi_all";
     var psmValue = parseInt(req.body.psmValue);

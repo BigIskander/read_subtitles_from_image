@@ -68,6 +68,13 @@ body {
     margin-right: 2%;
     display: none;
 }
+#paddle_ocr_multiline {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 2%;
+    margin-right: 2%;
+    display: none;
+}
 #subtitles_color {
     background-color: rgba(255, 255, 255, 255);
     color: rgba(0, 0, 0, 255);
