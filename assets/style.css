@@ -90,6 +90,7 @@ body {
     margin-bottom: 5px;
 }
 #result {
+    font-size: x-large;
     width: 1024px; 
     height: 450px; 
     resize: none;
