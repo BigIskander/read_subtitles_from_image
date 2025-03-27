@@ -72,20 +72,21 @@ async function recognizePaddleOcr(imageBuffer, lang) {
   var commandArgs = [script, lang];
   var paddleProcess = childProcess.spawn(python3, commandArgs);
   // get results
+  var output = "";
   var result = await new Promise(async (resolve) => {
     paddleProcess.on('error', (err) => { resolve({ err: err.toString(), data: "" }); });
     paddleProcess.on('close', (code) => { 
       if(code == 0) 
-          resolve({ err: "", data: "" }); 
+        resolve({ err: "", data: output }); 
       else
           resolve({ err: "PaddleOCR, python3 script closed with status: " + code, data: "" });
     });
     paddleProcess.stdout.on('data', function (data) {
       // parse stdout
-      var re = /ppocr\s{0,}INFO:\s{0,}\(\'(?<w>.{0,})\'\,.{0,}\)/;
-      var find = data.toString().match(re);
-      if(find != null) {
-        resolve({ err: "", data: find.groups.w });
+      var re = /ppocr\s{0,}INFO:\s{0,}\(\'(?<w>.{0,})\'\,.{0,}\)/g;
+      var find = data.toString().matchAll(re);
+      for(const f of find) {
+        if(f.groups.w != null) output = output + f.groups.w + "\n";
       }
     });
     paddleProcess.stderr.on('data', (err) => {

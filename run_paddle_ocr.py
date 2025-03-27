@@ -5,9 +5,10 @@ img_bytes = sys.stdin.buffer.read()
 lang = sys.argv[1]
 
 ocr = PaddleOCR(use_angle_cls=True, lang=lang) # need to run only once to load model into memory
-result = ocr.ocr(img_bytes, det=False, cls=True)
+result = ocr.ocr(img_bytes, cls=True) # det=False, 
 for idx in range(len(result)):
     res = result[idx]
+    print(res)
     for line in res:
         # make somewhat simmilar output, so same regex can be used
-        print(" ppocr INFO: ('" + line[0] + "', " + str(line[1]) + ") ")
+        print(" ppocr INFO: ('" + line[1][0] + "', " + str(line[1][1]) + ") ")
