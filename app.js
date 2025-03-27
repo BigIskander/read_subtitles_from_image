@@ -76,17 +76,21 @@ async function recognizePaddleOcr(imageBuffer, lang) {
   var result = await new Promise(async (resolve) => {
     paddleProcess.on('error', (err) => { resolve({ err: err.toString(), data: "" }); });
     paddleProcess.on('close', (code) => { 
-      if(code == 0) 
-        resolve({ err: "", data: output }); 
-      else
-          resolve({ err: "PaddleOCR, python3 script closed with status: " + code, data: "" });
+      if(code == 0) {
+        if(output.length > 0) output = output.slice(0, -1);
+        resolve({ err: "", data: output });
+      } else {
+        resolve({ err: "PaddleOCR, python3 script closed with status: " + code, data: "" });
+      } 
     });
     paddleProcess.stdout.on('data', function (data) {
       // parse stdout
       var re = /ppocr\s{0,}INFO:\s{0,}\(\'(?<w>.{0,})\'\,.{0,}\)/g;
       var find = data.toString().matchAll(re);
-      for(const f of find) {
-        if(f.groups.w != null) output = output + f.groups.w + "\n";
+      if(find != null) {
+        for(const f of find) {
+          if(f.groups.w != null) output = output + f.groups.w + "\n";
+        }
       }
     });
     paddleProcess.stderr.on('data', (err) => {
