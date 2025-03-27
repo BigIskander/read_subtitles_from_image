@@ -6,10 +6,10 @@ const childProcess = require('child_process');
 const app = express();
 const port = process.env.PORT || 3000;
 const langs = process.env.TESSLANGS ? 
-  process.env.TESSLANGS.split(";").filter(item => item!="")
+  process.env.TESSLANGS.replace(/(?:\s)/g, '').split(";").filter(item => item!="")
   : ["chi_all", "eng"];
 const langsPaddle = process.env.PADDLELANGS ?
-  process.env.PADDLELANGS.split(";").filter(item => item!="")
+  process.env.PADDLELANGS.replace(/(?:\s)/g, '').split(";").filter(item => item!="")
   : ["ch", "en", "chinese_cht"];
 
 // to parse reqests
@@ -21,7 +21,7 @@ var corsOptions = {
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   preflightContinue: false,
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-}
+};
 // if dev environment use cors else block cross origin request
 if(process.env.DEV == 'true') {
   app.use(cors(corsOptions));
