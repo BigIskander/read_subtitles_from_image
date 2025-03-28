@@ -12,7 +12,7 @@ import isElectron from 'is-electron';
 import { paddleOcrLangs } from './paddleOcrLangsList';
 
 // backend server host
-const server_host = import.meta.env.PROD ? document.location.origin : "http://localhost:3000";
+const server_host = import.meta.env.PROD ? document.location.origin : "http://localhost:8000";
 
 var camera, scene, renderer, clock, renderTarget, renderTargetF, sceneRTT, sceneRTTF;
 var clicked = false;
