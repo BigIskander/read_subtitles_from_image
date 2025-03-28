@@ -1,8 +1,12 @@
-import sys
+import os, sys, re
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+
+# get env variables
+envTesslangs = [lang for lang in re.sub(r'(?:\s)', "", os.environ.get("TESSLANGS", "chi_all;eng;")).split(";") if lang != ""]
+envPaddlelangs = [lang for lang in re.sub(r'(?:\s)', "", os.environ.get("PADDLELANGS", "ch;en;chinese_cht;")).split(";") if lang != ""]
 
 app = FastAPI()
 
@@ -21,8 +25,8 @@ if sys.argv[1] == "dev":
 @app.get("/langs")
 def read_item():
     return { 
-        "langs": ["chi_all", "eng"],
-        "langsPaddle": ["ch", "en", "chinese_cht"] 
+        "langs": envTesslangs,
+        "langsPaddle": envPaddlelangs 
     }
 
 class rcognizeRequest(BaseModel):
@@ -37,7 +41,7 @@ def create_item(requestData: rcognizeRequest):
     if not requestData.usePaddleOcr:
         return { "err": "", "data": "not implemented yet"}
     else:
-        return { "err": "", "data": str(sys.argv[1]) }
+        return { "err": "", "data": str(envTesslangs) }
 
 # serve static files
 app.mount("/", StaticFiles(directory="dist", html=True), name="static")
