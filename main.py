@@ -1,3 +1,4 @@
+import sys
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -5,18 +6,19 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-origins = [
-    "http://localhost:5173",
-    "http://localhost:8080",
-]
+if sys.argv[1] == "dev":
+    origins = [
+        "http://localhost:5173",
+        "http://localhost:8080",
+    ]
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 @app.get("/langs")
 def read_item():
@@ -37,7 +39,7 @@ def create_item(requestData: rcognizeRequest):
     if not requestData.usePaddleOcr:
         return { "err": "", "data": "not implemented yet"}
     else:
-        return { "err": "", "data": requestData.base64image }
+        return { "err": "", "data": str(sys.argv[1]) }
 
 # serve static files
 app.mount("/", StaticFiles(directory="dist", html=True), name="static")
