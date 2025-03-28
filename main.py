@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from subprocess import Popen, PIPE
 from paddleocr import PaddleOCR
 
 # get env variables
@@ -52,12 +53,43 @@ class rcognizeRequest(BaseModel):
 @app.post("/recognize")
 def create_item(requestData: rcognizeRequest):
     img_bytes = base64.b64decode(requestData.base64image.split("base64,")[1])
-    lang = requestData.lang
     if not requestData.usePaddleOcr:
-        return { "err": "", "data": "not implemented yet"}
+        # recognize text Tesseract OCR
+        # check data
+        if requestData.lang in envTesslangs:
+            lang = requestData.lang
+        else:
+            lang = "chi_all"
+        if requestData.psmValue >=0 and requestData.psmValue <=13:
+            psm = requestData.psmValue
+        else:
+            psm = int(3)
+        # run Tesseract OCR and return results
+        try:
+            tesseract = Popen([
+                "tesseract", 
+                "-l", lang, 
+                "--dpi", "96", 
+                "--psm", str(psm), 
+                "--oem", "3", 
+                "-", "stdout"
+            ], stdout=PIPE, stdin=PIPE, stderr=PIPE, text=False)
+            stdout_data = tesseract.communicate(input=img_bytes)
+            if stdout_data[1].decode() != "":
+                return { "err": stdout_data[1].decode(), "data": "" }
+            else:
+                return { "err": "", "data": stdout_data[0].decode() }
+        except Exception as e:
+            return { "err": str(e), "data": "" }
     else:
         # recognize text PaddleOCR
+        # check data
+        if requestData.lang in envPaddlelangs:
+            lang = requestData.lang
+        else:
+            lang = "ch"
         det = requestData.multiline
+        # run PaddleOCR and return results
         output = ""
         try:
             ocr = PaddleOCR(use_angle_cls=True, lang=lang)
@@ -71,8 +103,6 @@ def create_item(requestData: rcognizeRequest):
                     else:
                         for line in res:
                             output = output + line[0] + "\n"
-            if output != "":
-                output = output[:-1]
             return { "err": "", "data": str(output) }
         except Exception as e:
             return { "err": str(e), "data": "" }
