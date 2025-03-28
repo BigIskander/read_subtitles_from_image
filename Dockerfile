@@ -29,6 +29,11 @@ RUN python3 -m pip install "fastapi[standard]"
 WORKDIR /app
 COPY . .
 
+# call PaddleOCR to download models
+RUN paddleocr --image_dir https://raw.githubusercontent.com/PaddlePaddle/PaddleOCR/refs/heads/main/tests/test_files/254.jpg --use_angle_cls true --lang ch
+RUN paddleocr --image_dir https://raw.githubusercontent.com/PaddlePaddle/PaddleOCR/refs/heads/main/tests/test_files/254.jpg --use_angle_cls true --lang en
+RUN paddleocr --image_dir https://raw.githubusercontent.com/PaddlePaddle/PaddleOCR/refs/heads/main/tests/test_files/254.jpg --use_angle_cls true --lang chinese_cht
+
 # tesseract trained data
 RUN mkdir tesseract_traineddata \
 && wget https://github.com/gumblex/tessdata_chi/releases/download/v20220621/chi_v3_20220621.zip \
