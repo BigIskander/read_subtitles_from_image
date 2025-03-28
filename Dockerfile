@@ -22,12 +22,12 @@ RUN wget github.com/tesseract-ocr/tesseract/archive/4.1.1.zip && \
 RUN python3 -m pip install paddlepaddle==3.0.0rc1 -i https://www.paddlepaddle.org.cn/packages/stable/cpu/
 RUN python3 -m pip install "paddleocr>=2.0.1"
 
+# install FastAPI
+RUN python3 -m pip install "fastapi[standard]"
+
 # copy app files and install node js depencies
 WORKDIR /app
 COPY . .
-
-# install FastAPI
-RUN python3 -m pip install "fastapi[standard]"
 
 # tesseract trained data
 RUN mkdir tesseract_traineddata \
