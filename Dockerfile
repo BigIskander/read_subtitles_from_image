@@ -18,6 +18,10 @@ RUN wget github.com/tesseract-ocr/tesseract/archive/4.1.1.zip && \
     make training && \
     make training-install
 
+# install PaddleOCR
+RUN python3 -m pip install paddlepaddle==3.0.0rc1 -i https://www.paddlepaddle.org.cn/packages/stable/cpu/
+RUN python3 -m pip install "paddleocr>=2.0.1"
+
 # copy app files and install node js depencies
 WORKDIR /app
 COPY . .
@@ -32,10 +36,6 @@ RUN mkdir tesseract_traineddata \
 && rm chi_v3_20220621.zip \
 && cd ./tesseract_traineddata \
 && wget https://github.com/tesseract-ocr/tessdata/raw/refs/heads/main/eng.traineddata && cd .. 
-
-# install PaddleOCR
-RUN python3 -m pip install paddlepaddle==3.0.0rc1 -i https://www.paddlepaddle.org.cn/packages/stable/cpu/
-RUN python3 -m pip install "paddleocr>=2.0.1"
 
 # set environment variables
 ENV TESSDATA_PREFIX=/app/tesseract_traineddata
