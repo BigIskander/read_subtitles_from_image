@@ -25,7 +25,7 @@ RUN python3 -m pip install "paddleocr>=2.0.1"
 # install FastAPI
 RUN python3 -m pip install "fastapi[standard]"
 
-# copy app files and install node js depencies
+# copy app files
 WORKDIR /app
 COPY . .
 
