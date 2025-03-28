@@ -1,4 +1,4 @@
-import os, sys, re, base64
+import os, sys, re, base64, uvicorn
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -24,17 +24,18 @@ envPaddlelangs = [
 
 app = FastAPI()
 
-if sys.argv[1] == "dev":
-    origins = [
-        "http://localhost:5173",
-    ]
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=origins,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+if len(sys.argv) >=2:
+    if sys.argv[1] == "dev":
+        origins = [
+            "http://localhost:5173",
+        ]
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=origins,
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
 
 @app.get("/langs")
 def read_item():
@@ -109,3 +110,7 @@ def create_item(requestData: rcognizeRequest):
 
 # serve static files
 app.mount("/", StaticFiles(directory="dist", html=True), name="static")
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", "8080"))
+    uvicorn.run(app, host="0.0.0.0", port=port)
