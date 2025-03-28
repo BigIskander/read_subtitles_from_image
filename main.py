@@ -5,8 +5,20 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 # get env variables
-envTesslangs = [lang for lang in re.sub(r'(?:\s)', "", os.environ.get("TESSLANGS", "chi_all;eng;")).split(";") if lang != ""]
-envPaddlelangs = [lang for lang in re.sub(r'(?:\s)', "", os.environ.get("PADDLELANGS", "ch;en;chinese_cht;")).split(";") if lang != ""]
+envTesslangs = [
+    lang for lang in 
+        re.sub(r'(?:\s)', "", 
+            os.environ.get("TESSLANGS", "chi_all;eng;")
+        ).split(";") 
+        if lang != ""
+]
+envPaddlelangs = [
+    lang for lang in 
+        re.sub(r'(?:\s)', "", 
+            os.environ.get("PADDLELANGS", "ch;en;chinese_cht;")
+        ).split(";") 
+        if lang != ""
+]
 
 app = FastAPI()
 
