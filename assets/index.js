@@ -90,6 +90,7 @@ resultElement.value = "";
 var fileChooserElement = document.querySelector("#file_choser");
 // OCR engine
 var ocrSelect = document.querySelector("#ocr");
+var getLangs = null;
 // Tesseract OCR
 var tesseractOcrLangChoser = document.querySelector("#tesseract_ocr_lang_choser");
 var tesseractOcrLangChoserSelect = document.querySelector("#tesseract_ocr_lang_choser_select");
@@ -825,21 +826,20 @@ async function initElectron() {
         tessdatadir: tesseractSettings.tessdatadir,
         language: tesseractSettings.language
     };
+    getLangs = await window.OCR.getLangs();
     displaySettings(tesseractSettingsT);
 }
 
 async function loadLangOptions() {
     if(!isElectron()) {
         try {
-            var getLangs = JSON.parse(await load_langs());
+            getLangs = JSON.parse(await load_langs());
         } catch(error) {
             alert("Failed to get list of languages, please try to reload the page!\nerror: " + error);
             console.log(error);
             return;
         }
-    } else {
-        var getLangs = await window.OCR.getLangs();
-    }
+    } 
     var tesseractOcrLangList = getLangs.langs;
     var paddleOcrLangList = getLangs.langsPaddle;
     // Tesseract OCR
@@ -862,8 +862,9 @@ async function loadLangOptions() {
 }
 
 // for electron version only
+// load electron settings first
 if(isElectron()) {
-    initElectron();
+    await initElectron();
 }
 
 loadLangOptions();
