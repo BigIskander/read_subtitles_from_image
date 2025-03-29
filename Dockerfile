@@ -22,18 +22,16 @@ RUN apt-get update && \
     apt-get remove libleptonica-dev automake make pkg-config libsdl-pango-dev libicu-dev libcairo2-dev bc ffmpeg libsm6 libxext6 -y  && \
     apt-get autoremove -y
 
-# libGL.so
-# https://stackoverflow.com/questions/55313610/importerror-libgl-so-1-cannot-open-shared-object-file-no-such-file-or-directo
-RUN apt-get install libgl1 -y
+# libGL.so1 and liblept.so5 not found fix
+RUN apt-get install libgl1 liblept5 -y
 
 # install PaddleOCR and fastapi
 RUN python3 -m pip install paddlepaddle==3.0.0rc1 -i https://www.paddlepaddle.org.cn/packages/stable/cpu/ && \
     python3 -m pip install "paddleocr>=2.0.1" && \
     python3 -m pip install "fastapi[standard]"
 
-# copy app files
+# set workdir
 WORKDIR /app
-COPY . .
 
 # call PaddleOCR to download models
 RUN paddleocr --image_dir https://raw.githubusercontent.com/PaddlePaddle/PaddleOCR/refs/heads/main/tests/test_files/254.jpg --use_angle_cls true --lang ch && \
@@ -47,6 +45,9 @@ RUN mkdir tesseract_traineddata && \
     rm chi_v3_20220621.zip && \
     cd ./tesseract_traineddata && \
     wget https://github.com/tesseract-ocr/tessdata/raw/refs/heads/main/eng.traineddata && cd .. 
+
+# copy app files
+COPY . .
 
 # set environment variables
 ENV TESSDATA_PREFIX=/app/tesseract_traineddata \
