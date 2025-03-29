@@ -12,7 +12,7 @@ import isElectron from 'is-electron';
 import { paddleOcrLangs } from './paddleOcrLangsList';
 
 // backend server host
-const server_host = import.meta.env.PROD ? document.location.origin : "http://localhost:8000";
+const server_host = import.meta.env.PROD ? document.location.origin : "http://localhost:7000";
 
 var camera, scene, renderer, clock, renderTarget, renderTargetF, sceneRTT, sceneRTTF;
 var clicked = false;
@@ -714,7 +714,7 @@ async function recognizeText() {
 }
 
 // request data from backend server
-function recognizeTextRequestExpress(usePaddleOcr, base64image, lang, psmValue, multiline) {
+function recognizeTextRequestFastapi(usePaddleOcr, base64image, lang, psmValue, multiline) {
     return new Promise(async (resolve, reject) => {
         try {
             var response = await fetch(server_host + "/recognize", {
@@ -746,7 +746,7 @@ function recognizeTextRequestElectron(usePaddleOcr, base64image, lang, psmValue)
 }
 
 const recognizeTextRequest = isElectron() ? 
-                                recognizeTextRequestElectron : recognizeTextRequestExpress;
+                                recognizeTextRequestElectron : recognizeTextRequestFastapi;
 
 
 // for electron version only
@@ -856,12 +856,13 @@ async function loadLangOptions() {
         }
     }
 }
-loadLangOptions();
 
 // for electron version only
 if(isElectron()) {
     initElectron();
 }
+
+loadLangOptions();
 
 init();
 
