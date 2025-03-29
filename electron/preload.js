@@ -31,8 +31,8 @@ var tessdatadir = null;
 var tesseractPath = null;
 
 // tesseract OCR
-contextBridge.exposeInMainWorld('tesseractOCR', {
-    recognize: (imageDataUrl, psmValue) => {
+contextBridge.exposeInMainWorld('OCR', {
+    recognize: (usePaddleOcr, imageDataUrl, lang, psmValue) => {
         const imageBuffer = Buffer.from(imageDataUrl.split('base64,')[1], 'base64');
         var tesseract = tesseractPath ? path.join(tesseractPath, "tesseract") : "tesseract";
         psmValue = parseInt(psmValue);
@@ -61,6 +61,12 @@ contextBridge.exposeInMainWorld('tesseractOCR', {
             tesseractProcess.stdin.end();
         });
         return prom;
+    },
+    getLangs: async () => {
+        return { 
+            "langs": ["chi_all", "eng"],
+            "langsPaddle": ["ch", "en", "chinese_cht"] 
+        }
     },
     initSettings: async () => {
         await storage.init({ dir: storageDir });

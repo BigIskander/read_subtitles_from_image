@@ -741,7 +741,7 @@ function recognizeTextRequestFastapi(usePaddleOcr, base64image, lang, psmValue, 
 // request data from backend electron
 function recognizeTextRequestElectron(usePaddleOcr, base64image, lang, psmValue) {
     return new Promise(async (resolve, reject) => {
-        resolve(await window.tesseractOCR.recognize(base64image, psmValue));
+        resolve(await window.OCR.recognize(usePaddleOcr, base64image, lang, psmValue));
     });
 }
 
@@ -778,7 +778,7 @@ function settingsShowHide() {
 
 // for electron version only
 async function choseFolder(isTesseractPath = true) {
-    var folder = await window.tesseractOCR.choseFolder();
+    var folder = await window.OCR.choseFolder();
     if(folder) {
         if(isTesseractPath) 
             tesseractSettingsT.tesseractPath = folder[0];
@@ -807,7 +807,7 @@ function saveSettings() {
     if(tesseractSettingsT.language != language.value) 
         languageUpdated();
     copySettings(tesseractSettingsT, tesseractSettings);
-    window.tesseractOCR.saveSettings(tesseractSettings);
+    window.OCR.saveSettings(tesseractSettings);
     alert("Settings saved.");
 }
 
@@ -819,7 +819,7 @@ async function initElectron() {
     setting.style.display = "block";
     settingsSH.addEventListener("click", settingsShowHide);
     language.addEventListener("contextmenu", window.electronAPI.showContextMenu2);
-    tesseractSettings = await window.tesseractOCR.initSettings();
+    tesseractSettings = await window.OCR.initSettings();
     tesseractSettingsT = {
         tesseractPath: tesseractSettings.tesseractPath,
         tessdatadir: tesseractSettings.tessdatadir,
@@ -829,12 +829,16 @@ async function initElectron() {
 }
 
 async function loadLangOptions() {
-    try {
-        var getLangs = JSON.parse(await load_langs());
-    } catch(error) {
-        alert("Failed to get list of languages, please try to reload the page!\nerror: " + error);
-        console.log(error);
-        return;
+    if(!isElectron()) {
+        try {
+            var getLangs = JSON.parse(await load_langs());
+        } catch(error) {
+            alert("Failed to get list of languages, please try to reload the page!\nerror: " + error);
+            console.log(error);
+            return;
+        }
+    } else {
+        var getLangs = await window.OCR.getLangs();
     }
     var tesseractOcrLangList = getLangs.langs;
     var paddleOcrLangList = getLangs.langsPaddle;
