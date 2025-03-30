@@ -26,46 +26,105 @@ contextBridge.exposeInMainWorld('electronAPI', {
     showContextMenu2: (event) => { ipcRenderer.send('show-context-menu2', event); }
 });
 
+// recognize text using Tesseract OCR
+async function recognizeTesseractOcr(imageBuffer, lang, psmValue) {
+  // run tesseract
+  var tesseract = "tesseract";
+  var commandArgs = ["-l", lang, "--dpi", "96", "--psm", psmValue, "--oem", "3", "-", "stdout"];
+  var tesseractProcess = childProcess.spawn(tesseract, commandArgs);
+  // get results
+  var result = await new Promise(async (resolve) => {
+    tesseractProcess.on('error', (err) => { resolve({ err: err.toString(), data: "" }); });
+    tesseractProcess.on('close', (code) => { 
+      if(code == 0) 
+          resolve({ err: "", data: "" }); 
+      else
+          resolve({ err: "tesseract closed with status: " + code, data: "" });
+    });
+    tesseractProcess.stdout.on('data', function (data) {
+      resolve({ err: "", data: data.toString() });
+    });
+    tesseractProcess.stderr.on('data', (err) => {
+      resolve({ err: err.toString(), data: "" });
+    });
+    tesseractProcess.stdin.write(imageBuffer);
+    tesseractProcess.stdin.end();
+  });
+  return result;
+}
+
+// recognize text using PaddleOCR
+async function recognizePaddleOcr(imageBuffer, lang, multiline) {
+  // run PaddleOCR
+  var python3 = "python3";
+  var script = path.join(process.cwd(), "run_paddle_ocr.py");
+  var commandArgs = [script, lang];
+  if(multiline) commandArgs.push("multiline");
+  var paddleProcess = childProcess.spawn(python3, commandArgs);
+  // get results
+  var output = "";
+  var result = await new Promise(async (resolve) => {
+    paddleProcess.on('error', (err) => { resolve({ err: err.toString(), data: "" }); });
+    paddleProcess.on('close', (code) => { 
+      if(code == 0) {
+        if(output.length > 0) output = output.slice(0, -1);
+        resolve({ err: "", data: output });
+      } else {
+        resolve({ err: "PaddleOCR, python3 script closed with status: " + code, data: "" });
+      } 
+    });
+    paddleProcess.stdout.on('data', function (data) {
+      // parse stdout
+      var re = /ppocr\s{0,}INFO:\s{0,}\(\'(?<w>.{0,})\'\,.{0,}\)/g;
+      var find = data.toString().matchAll(re);
+      if(find != null) {
+        for(const f of find) {
+          if(f.groups.w != null) output = output + f.groups.w + "\n";
+        }
+      }
+    });
+    paddleProcess.stderr.on('data', (err) => {
+      // parse stderr
+      var re = /Error:(?<w>.{0,})/;
+      var find = err.toString().match(re);
+      if(find != null) {
+        resolve({ err: find.groups.w, data: "" });
+      }
+    });
+    paddleProcess.stdin.write(imageBuffer);
+    paddleProcess.stdin.end();
+  });
+  return result;
+}
+
+var langs = ["chi_all", "eng"]
+var langsPaddle = ["ch", "en", "chinese_cht"]
 var language = "chi_all";
 var tessdatadir = null;
 var tesseractPath = null;
 
 // tesseract OCR
 contextBridge.exposeInMainWorld('OCR', {
-    recognize: (usePaddleOcr, imageDataUrl, lang, psmValue) => {
-        const imageBuffer = Buffer.from(imageDataUrl.split('base64,')[1], 'base64');
-        var tesseract = tesseractPath ? path.join(tesseractPath, "tesseract") : "tesseract";
-        psmValue = parseInt(psmValue);
-        psmValue = (0 <= psmValue && psmValue <= 13) ? psmValue : 3;
-        var commandArgs = ["-l", language, "--dpi", "96", "--psm", psmValue, "--oem", "3", "-", "stdout"];
-        if(tessdatadir) {
-            commandArgs.splice(0, 0, "--tessdata-dir");
-            commandArgs.splice(1, 0, tessdatadir);
+    recognize: async (usePaddleOcr, imageDataUrl, lang, psmValue, multiline) => {
+        var imageBuffer = Buffer.from(imageDataUrl.split('base64,')[1], 'base64');
+        // get results
+        if(usePaddleOcr) {
+            var lang = langsPaddle.includes(lang) ? lang : "ch";
+            var multiline = Boolean(multiline);
+            var result = await recognizePaddleOcr(imageBuffer, lang, multiline);
+        } else {
+            var lang = langs.includes(lang) ? lang : "chi_all";
+            var psmValue = parseInt(psmValue);
+            psmValue = (0 <= psmValue && psmValue <= 13) ? psmValue : 3;
+            var result = await recognizeTesseractOcr(imageBuffer, lang, psmValue);
         }
-        var tesseractProcess = childProcess.spawn(tesseract, commandArgs);
-        const prom = new Promise(async (resolve) => {
-            tesseractProcess.on('error', (err) => { resolve({ err: err.toString(), data: "" }); });
-            tesseractProcess.on('close', (code) => { 
-                if(code == 0) 
-                    resolve({ err: "", data: "" }); 
-                else
-                    resolve({ err: "tesseract closed with status: " + code, data: "" });
-            });
-            tesseractProcess.stdout.on('data', function (data) {
-                resolve({ err: "", data: data.toString() });
-            });
-            tesseractProcess.stderr.on('data', (err) => {
-                resolve({ err: err.toString(), data: "" });
-            });
-            tesseractProcess.stdin.write(imageBuffer);
-            tesseractProcess.stdin.end();
-        });
-        return prom;
+        // return results to frontend
+        return result;
     },
     getLangs: async () => {
         return { 
-            "langs": ["chi_all", "eng"],
-            "langsPaddle": ["ch", "en", "chinese_cht"] 
+            "langs": langs,
+            "langsPaddle": langsPaddle 
         }
     },
     initSettings: async () => {

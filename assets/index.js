@@ -740,9 +740,9 @@ function recognizeTextRequestFastapi(usePaddleOcr, base64image, lang, psmValue, 
 }
 
 // request data from backend electron
-function recognizeTextRequestElectron(usePaddleOcr, base64image, lang, psmValue) {
+function recognizeTextRequestElectron(usePaddleOcr, base64image, lang, psmValue, multiline) {
     return new Promise(async (resolve, reject) => {
-        resolve(await window.OCR.recognize(usePaddleOcr, base64image, lang, psmValue));
+        resolve(await window.OCR.recognize(usePaddleOcr, base64image, lang, psmValue, multiline));
     });
 }
 
