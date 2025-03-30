@@ -121,12 +121,6 @@ contextBridge.exposeInMainWorld('OCR', {
         // return results to frontend
         return result;
     },
-    getLangs: async () => {
-        return { 
-            "langs": langs,
-            "langsPaddle": langsPaddle 
-        }
-    },
     initSettings: async () => {
         await storage.init({ dir: storageDir });
         var settings = await storage.getItem("settings");
@@ -135,12 +129,16 @@ contextBridge.exposeInMainWorld('OCR', {
             tessdatadir = settings.tessdatadir;
             tesseractPath = settings.tesseractPath;
             return { 
+                langs: langs,
+                langsPaddle: langsPaddle,
                 tesseractPath: tesseractPath, 
                 tessdatadir: tessdatadir, 
                 language: language 
             }; 
         } else {
             return { 
+                langs: langs,
+                langsPaddle: langsPaddle,
                 tesseractPath: tesseractPath, 
                 tessdatadir: tessdatadir, 
                 language: language 

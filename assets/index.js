@@ -109,8 +109,8 @@ var tesseractPath = document.querySelector("#tesseract_path");
 var tessdatadir = document.querySelector("#tessdatadir");
 var language = document.querySelector("#tesseract_language");
 var psm = document.querySelector("#psm");
-var tesseractSettings;
-var tesseractSettingsT;
+var OCRSettings;
+var OCRSettingsT;
 
 async function init() {
     camera = new THREE.Camera();
@@ -772,8 +772,8 @@ function settingsShowHide() {
     } else {
         settingsSet.style.display = "none";
         settingsSH.innerHTML = "show";
-        copySettings(tesseractSettings, tesseractSettingsT);
-        displaySettings(tesseractSettingsT);
+        copySettings(OCRSettings, OCRSettingsT);
+        displaySettings(OCRSettingsT);
     }
 }
 
@@ -782,33 +782,33 @@ async function choseFolder(isTesseractPath = true) {
     var folder = await window.OCR.choseFolder();
     if(folder) {
         if(isTesseractPath) 
-            tesseractSettingsT.tesseractPath = folder[0];
+            OCRSettingsT.tesseractPath = folder[0];
         else 
-            tesseractSettingsT.tessdatadir = folder[0];
-        displaySettings(tesseractSettingsT);
+            OCRSettingsT.tessdatadir = folder[0];
+        displaySettings(OCRSettingsT);
     }
 }
 
 // for electron version only
 function clearFolder(isTesseractPath = true) {
     if(isTesseractPath)
-        tesseractSettingsT.tesseractPath = null;
+        OCRSettingsT.tesseractPath = null;
     else
-        tesseractSettingsT.tessdatadir = null;
-    displaySettings(tesseractSettingsT);
+        OCRSettingsT.tessdatadir = null;
+    displaySettings(OCRSettingsT);
 }
 
 // for electron version only
 function languageUpdated() {
-    tesseractSettingsT.language = language.value;
+    OCRSettingsT.language = language.value;
 }
 
 // for electron version only
 function saveSettings() {
-    if(tesseractSettingsT.language != language.value) 
+    if(OCRSettingsT.language != language.value) 
         languageUpdated();
-    copySettings(tesseractSettingsT, tesseractSettings);
-    window.OCR.saveSettings(tesseractSettings);
+    copySettings(OCRSettingsT, OCRSettings);
+    window.OCR.saveSettings(OCRSettings);
     alert("Settings saved.");
 }
 
@@ -820,14 +820,14 @@ async function initElectron() {
     setting.style.display = "block";
     settingsSH.addEventListener("click", settingsShowHide);
     language.addEventListener("contextmenu", window.electronAPI.showContextMenu2);
-    tesseractSettings = await window.OCR.initSettings();
-    tesseractSettingsT = {
-        tesseractPath: tesseractSettings.tesseractPath,
-        tessdatadir: tesseractSettings.tessdatadir,
-        language: tesseractSettings.language
+    OCRSettings = await window.OCR.initSettings();
+    OCRSettingsT = {
+        tesseractPath: OCRSettings.tesseractPath,
+        tessdatadir: OCRSettings.tessdatadir,
+        language: OCRSettings.language
     };
-    getLangs = await window.OCR.getLangs();
-    displaySettings(tesseractSettingsT);
+    getLangs = { langs: OCRSettings.langs, langsPaddle: OCRSettings.langsPaddle };
+    displaySettings(OCRSettingsT);
 }
 
 async function loadLangOptions() {
