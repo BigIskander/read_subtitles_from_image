@@ -105,9 +105,13 @@ var gitLink = document.querySelector("#gitLink");
 var setting = document.querySelector("#settings");
 var settingsSet = document.querySelector("#settings_set");
 var settingsSH = document.querySelector("#settings_show_hide");
+var enableTesseractOCRElement = document.querySelector("#enable_Tesseract_OCR");
+var enablePaddleOCRElement = document.querySelector("#enable_Paddle_OCR");
+var langsElement = document.querySelector("#langs_element");
+var langsPaddleElement = document.querySelector("#langs_paddle_element");
 var tesseractPath = document.querySelector("#tesseract_path");
 var tessdatadir = document.querySelector("#tessdatadir");
-var language = document.querySelector("#tesseract_language");
+// var language = document.querySelector("#tesseract_language");
 var psm = document.querySelector("#psm");
 var OCRSettings;
 var OCRSettingsT;
@@ -624,7 +628,7 @@ function changeOcr() {
 }
 
 function showPsmHelp() {
-    alert("\
+    showMessage("\
         psm values explained: \n\ \n\
         0    Orientation and script detection (OSD) only. \n\
         1    Automatic page segmentation with OSD \n\
@@ -749,19 +753,33 @@ function recognizeTextRequestElectron(usePaddleOcr, base64image, lang, psmValue,
 const recognizeTextRequest = isElectron() ? 
                                 recognizeTextRequestElectron : recognizeTextRequestFastapi;
 
+const showMessage = isElectron() ? showMessageElectron : alert;
+
+// for electron version only
+function showMessageElectron(message) {
+    window.electronAPI.showDialog(message);
+}
 
 // for electron version only
 function copySettings(from, to) {
+    to.enableTesseractOCR = from.enableTesseractOCR;
+    to.enablePaddleOCR = from.enablePaddleOCR;
+    to.langs = from.langs;
+    to.langsPaddle = from.langsPaddle;
     to.tesseractPath = from.tesseractPath;
     to.tessdatadir = from.tessdatadir;
-    to.language = from.language;
+    // to.language = from.language;
 }
 
 // for electron version only
 function displaySettings(settingS) {
+    enableTesseractOCRElement.checked = settingS.enableTesseractOCR;
+    enablePaddleOCRElement.checked = settingS.enablePaddleOCR;
+    langsElement.value = settingS.langs;
+    langsPaddleElement.value = settingS.langsPaddle;
     tesseractPath.innerHTML = settingS.tesseractPath == null ? "empty value" : settingS.tesseractPath;
     tessdatadir.innerHTML = settingS.tessdatadir == null ? "empty value" : settingS.tessdatadir;
-    language.value = settingS.language;
+    // language.value = settingS.language;
 }
 
 // for electron version only
@@ -799,17 +817,43 @@ function clearFolder(isTesseractPath = true) {
 }
 
 // for electron version only
-function languageUpdated() {
-    OCRSettingsT.language = language.value;
+function enableTesseractOCRChanged() {
+    OCRSettingsT.enableTesseractOCR = enableTesseractOCRElement.checked;
+}
+
+// for electron version only
+function enablePaddleOCRChanged() {
+    OCRSettingsT.enablePaddleOCR = enablePaddleOCRElement.checked;
+}
+
+// for electron version only
+function langsUpdated() {
+    OCRSettingsT.langs = langsElement.value;
+}
+
+// for electron version only
+function langsPaddleUpdated() {
+    OCRSettingsT.langsPaddle = langsPaddleElement.value;
 }
 
 // for electron version only
 function saveSettings() {
-    if(OCRSettingsT.language != language.value) 
-        languageUpdated();
+    if(OCRSettingsT.langs != langsElement.value) 
+        langsUpdated();
+    if(OCRSettingsT.langsPaddle != langsPaddleElement.value) 
+        langsPaddleUpdated();
+    getLangs = { 
+        langs: OCRSettingsT.langs.replace(/(?:\s)/g, '').split(";").filter(item => item!=""), 
+        langsPaddle: OCRSettingsT.langsPaddle.replace(/(?:\s)/g, '').split(";").filter(item => item!="")
+    };
+    OCRSettingsT.langs = getLangs.langs.join(";") + ";";
+    OCRSettingsT.langsPaddle = getLangs.langsPaddle.join(";") + ";";
     copySettings(OCRSettingsT, OCRSettings);
     window.OCR.saveSettings(OCRSettings);
-    alert("Settings saved.");
+    langsElement.value = OCRSettings.langs;
+    langsPaddleElement.value = OCRSettings.langsPaddle;
+    loadLangOptions();
+    showMessage("Settings saved.");
 }
 
 // for electron version only
@@ -819,14 +863,23 @@ async function initElectron() {
     resultElement.addEventListener("contextmenu", window.electronAPI.showContextMenu);
     setting.style.display = "block";
     settingsSH.addEventListener("click", settingsShowHide);
-    language.addEventListener("contextmenu", window.electronAPI.showContextMenu2);
+    langsElement.addEventListener("contextmenu", window.electronAPI.showContextMenu2);
+    langsPaddleElement.addEventListener("contextmenu", window.electronAPI.showContextMenu2);
     OCRSettings = await window.OCR.initSettings();
+    getLangs = { langs: OCRSettings.langs, langsPaddle: OCRSettings.langsPaddle };
+    enableTesseractOCRElement.checked = OCRSettings.enableTesseractOCR;
+    enablePaddleOCRElement.checked = OCRSettings.enablePaddleOCR;
+    OCRSettings.langs = OCRSettings.langs.join(";") + ";";
+    OCRSettings.langsPaddle = OCRSettings.langsPaddle.join(";") + ";";
     OCRSettingsT = {
+        enableTesseractOCR: OCRSettings.enableTesseractOCR,
+        enablePaddleOCR: OCRSettings.enablePaddleOCR,
+        langs: OCRSettings.langs,
+        langsPaddle: OCRSettings.langsPaddle,
         tesseractPath: OCRSettings.tesseractPath,
         tessdatadir: OCRSettings.tessdatadir,
-        language: OCRSettings.language
+        // language: OCRSettings.language
     };
-    getLangs = { langs: OCRSettings.langs, langsPaddle: OCRSettings.langsPaddle };
     displaySettings(OCRSettingsT);
 }
 
@@ -842,6 +895,8 @@ async function loadLangOptions() {
     } 
     var tesseractOcrLangList = getLangs.langs;
     var paddleOcrLangList = getLangs.langsPaddle;
+    tesseractOcrLangChoserSelect.innerHTML = "";
+    paddleOcrLangChoserSelect.innerHTML = "";
     // Tesseract OCR
     for(const lang of tesseractOcrLangList) {
         var option = document.createElement("option");
@@ -880,10 +935,14 @@ export {
     changeOcr,
     showPsmHelp,
     recognizeText,
+    enableTesseractOCRChanged,
+    enablePaddleOCRChanged,
+    langsUpdated,
+    langsPaddleUpdated,
     choseFolder,
     clearFolder,
-    languageUpdated,
-    saveSettings
+    saveSettings,
+    showMessage
 }
 
 // dinamic line geometry example

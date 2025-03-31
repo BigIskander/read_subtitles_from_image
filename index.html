@@ -13,11 +13,15 @@
       var pickSubtitlesColor;
       var showPsmHelp;
       var recognizeText;
+      var enableTesseractOCRChanged;
+      var enablePaddleOCRChanged;
+      var langsUpdated;
+      var langsPaddleUpdated;
       var choseFolder;
       var clearFolder;
-      var languageUpdated;
       var saveSettings;
       var changeOcr;
+      var showMessage;
     </script>
     <script type="module" defer>
       (async () => {
@@ -29,11 +33,15 @@
         pickSubtitlesColor = main.pickSubtitlesColor;
         showPsmHelp = main.showPsmHelp;
         recognizeText = main.recognizeText;
+        enableTesseractOCRChanged = main.enableTesseractOCRChanged;
+        enablePaddleOCRChanged = main.enablePaddleOCRChanged;
+        langsUpdated = main.langsUpdated;
+        langsPaddleUpdated = main.langsPaddleUpdated;
         choseFolder = main.choseFolder;
         clearFolder = main.clearFolder;
-        languageUpdated = main.languageUpdated;
         saveSettings = main.saveSettings;
         changeOcr = main.changeOcr;
+        showMessage = main.showMessage;
       })();
     </script>
   </head>
@@ -102,7 +110,17 @@
     </div>
     <div id="settings">
       Settings: <a id="settings_show_hide" href="JavaScript:void(0);">show</a>
-      <div id="settings_set">
+      <div id="settings_set" style="margin-top: 10px;">
+        <div>Use Tesseract OCR: <input id="enable_Tesseract_OCR" type="checkbox" onchange="enableTesseractOCRChanged()" checked></div>
+        <div>Use PaddleOCR: <input id="enable_Paddle_OCR" type="checkbox" onchange="enablePaddleOCRChanged()" checked></div>
+        <div>Tesseract languages: 
+          <input id="langs_element" type="text" maxlength="50" value="chi_all;eng;" onchange="langsUpdated()">
+          (<a href="JavaScript:void(0);" onclick="showMessage('super test message 22')">?</a>)
+        </div>
+        <div>PaddleOCR languages:
+          <input id="langs_paddle_element" type="text" maxlength="50" value="ch;en;chinese_cht;" onchange="langsPaddleUpdated()" focusable="true">
+          (<a href="JavaScript:void(0);" onclick="showMessage('super test message 33')">?</a>)
+        </div>
         <div>
           Tesseract path: <em id="tesseract_path">empty value</em>
         </div>
@@ -117,10 +135,7 @@
           <a href="JavaScript:void(0);" onclick="choseFolder(false)">chose folder</a> || 
           <a href="JavaScript:void(0);" onclick="clearFolder(false)">set empty value</a>
         </div>
-        <div>Tesseract language: 
-          <input id="tesseract_language" type="text" maxlength="50" value="chi_all" onchange="languageUpdated()">
-        </div>
-        <div><a href="JavaScript:void(0);" onclick="saveSettings()">Save settings.</a></div>
+        <div style="margin-top: 10px;"><a href="JavaScript:void(0);" onclick="saveSettings()">Save settings.</a></div>
       </div>
     </div>
     <div id="credits">

@@ -50,7 +50,9 @@ const createWindow = () => {
     const menu = Menu.buildFromTemplate(template);
     menu.popup(BrowserWindow.fromWebContents(event.sender));
   });
-
+  ipcMain.on('show-message', (event, message) => {
+    dialog.showMessageBoxSync(win, { message: message});
+  });
 }
 
 //Chosing the directory

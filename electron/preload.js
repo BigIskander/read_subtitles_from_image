@@ -23,7 +23,8 @@ contextBridge.exposeInMainWorld('externalLink', {
 // show context menu
 contextBridge.exposeInMainWorld('electronAPI', {
     showContextMenu: (event) => { ipcRenderer.send('show-context-menu', event); },
-    showContextMenu2: (event) => { ipcRenderer.send('show-context-menu2', event); }
+    showContextMenu2: (event) => { ipcRenderer.send('show-context-menu2', event); },
+    showDialog: (message) => { ipcRenderer.send('show-message', message); }
 });
 
 // recognize text using Tesseract OCR
@@ -97,9 +98,11 @@ async function recognizePaddleOcr(imageBuffer, lang, multiline) {
     return result;
 }
 
-var langs = ["chi_all", "eng"]
-var langsPaddle = ["ch", "en", "chinese_cht"]
-var language = "chi_all";
+var enableTesseractOCR = true;
+var enablePaddleOCR = true;
+var langs = ["chi_all", "eng", "eng"]
+var langsPaddle = ["ch", "en", "chinese_cht", "en"]
+// var language = "chi_all";
 var tessdatadir = null;
 var tesseractPath = null;
 
@@ -129,27 +132,32 @@ contextBridge.exposeInMainWorld('OCR', {
             tessdatadir = settings.tessdatadir;
             tesseractPath = settings.tesseractPath;
             return { 
+                enableTesseractOCR: enableTesseractOCR,
+                enablePaddleOCR: enablePaddleOCR,
                 langs: langs,
                 langsPaddle: langsPaddle,
                 tesseractPath: tesseractPath, 
                 tessdatadir: tessdatadir, 
-                language: language 
+                // language: language 
             }; 
         } else {
             return { 
+                enableTesseractOCR: enableTesseractOCR,
+                enablePaddleOCR: enablePaddleOCR,
                 langs: langs,
                 langsPaddle: langsPaddle,
                 tesseractPath: tesseractPath, 
                 tessdatadir: tessdatadir, 
-                language: language 
+                // language: language 
             }; 
         }
     },
-    saveSettings: (settings) => { 
-        tesseractPath = settings.tesseractPath;
-        tessdatadir = settings.tessdatadir;
-        language = settings.language;
-        storage.setItem("settings", settings);
+    saveSettings: (settings) => {
+        console.log(settings); 
+        // tesseractPath = settings.tesseractPath;
+        // tessdatadir = settings.tessdatadir;
+        // language = settings.language;
+        // storage.setItem("settings", settings);
     },
     choseFolder: () => { return ipcRenderer.invoke('choose-directory'); }
 });
