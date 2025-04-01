@@ -91,6 +91,8 @@ var fileChooserElement = document.querySelector("#file_choser");
 // OCR engine
 var ocrSelect = document.querySelector("#ocr");
 var getLangs = null;
+var enableTesseractOCR = true;
+var enablePaddleOCR = true;
 // Tesseract OCR
 var tesseractOcrLangChoser = document.querySelector("#tesseract_ocr_lang_choser");
 var tesseractOcrLangChoserSelect = document.querySelector("#tesseract_ocr_lang_choser_select");
@@ -850,6 +852,8 @@ function saveSettings() {
     OCRSettingsT.langsPaddle = getLangs.langsPaddle.join(";") + ";";
     copySettings(OCRSettingsT, OCRSettings);
     window.OCR.saveSettings(OCRSettings);
+    enableTesseractOCR = OCRSettings.enableTesseractOCR;
+    enablePaddleOCR = OCRSettings.enablePaddleOCR;
     langsElement.value = OCRSettings.langs;
     langsPaddleElement.value = OCRSettings.langsPaddle;
     loadLangOptions();
@@ -866,6 +870,8 @@ async function initElectron() {
     langsElement.addEventListener("contextmenu", window.electronAPI.showContextMenu2);
     langsPaddleElement.addEventListener("contextmenu", window.electronAPI.showContextMenu2);
     OCRSettings = await window.OCR.initSettings();
+    enableTesseractOCR = OCRSettings.enableTesseractOCR;
+    enablePaddleOCR = OCRSettings.enablePaddleOCR;
     getLangs = { langs: OCRSettings.langs, langsPaddle: OCRSettings.langsPaddle };
     enableTesseractOCRElement.checked = OCRSettings.enableTesseractOCR;
     enablePaddleOCRElement.checked = OCRSettings.enablePaddleOCR;
@@ -884,6 +890,12 @@ async function initElectron() {
 }
 
 async function loadLangOptions() {
+    // display none while not loaded
+    tesseractOcrLangChoser.style.display = "none";
+    tesseractOcrPsmChoser.style.display = "none";
+    paddleOcrLangChoser.style.display = "none";
+    paddleOcrMultiline.style.display = "none";
+    // fetch languages list if necessary
     if(!isElectron()) {
         try {
             getLangs = JSON.parse(await load_langs());
@@ -893,25 +905,45 @@ async function loadLangOptions() {
             return;
         }
     } 
-    var tesseractOcrLangList = getLangs.langs;
-    var paddleOcrLangList = getLangs.langsPaddle;
-    tesseractOcrLangChoserSelect.innerHTML = "";
-    paddleOcrLangChoserSelect.innerHTML = "";
+    // load options
+    ocrSelect.innerHTML = "";
     // Tesseract OCR
-    for(const lang of tesseractOcrLangList) {
+    if(enableTesseractOCR) {
         var option = document.createElement("option");
-        option.value = lang;
-        option.innerText = lang;
-        tesseractOcrLangChoserSelect.append(option);
-    }
-    // PaddleOCR
-    const keys = Object.keys(paddleOcrLangs);
-    for(const lang of paddleOcrLangList) {
-        if(keys.includes(lang)) {
+        option.value = "TesseractOCR";
+        option.innerText = "Tesseract OCR";
+        ocrSelect.append(option);
+        var tesseractOcrLangList = getLangs.langs;
+        tesseractOcrLangChoserSelect.innerHTML = "";
+        for(const lang of tesseractOcrLangList) {
             var option = document.createElement("option");
             option.value = lang;
-            option.innerText = paddleOcrLangs[lang];
-            paddleOcrLangChoserSelect.append(option);
+            option.innerText = lang;
+            tesseractOcrLangChoserSelect.append(option);
+        }
+        tesseractOcrLangChoser.style.display = "block";
+        tesseractOcrPsmChoser.style.display = "block";
+    }
+    // PaddleOCR
+    if(enablePaddleOCR) {
+        var option = document.createElement("option");
+        option.value = "PaddleOCR";
+        option.innerText = "PaddleOCR";
+        ocrSelect.append(option);
+        var paddleOcrLangList = getLangs.langsPaddle;
+        paddleOcrLangChoserSelect.innerHTML = "";
+        const keys = Object.keys(paddleOcrLangs);
+        for(const lang of paddleOcrLangList) {
+            if(keys.includes(lang)) {
+                var option = document.createElement("option");
+                option.value = lang;
+                option.innerText = paddleOcrLangs[lang];
+                paddleOcrLangChoserSelect.append(option);
+            }
+        }
+        if(!enableTesseractOCR) {
+            paddleOcrLangChoser.style.display = "block";
+            paddleOcrMultiline.style.display = "block";
         }
     }
 }
