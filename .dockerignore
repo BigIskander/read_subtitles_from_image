@@ -9,4 +9,6 @@ favicon.ico
 index.html
 package-lock.json
 package.json
+README_RUS.md
+README.md
 vite.config.js
