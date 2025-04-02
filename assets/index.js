@@ -90,6 +90,7 @@ resultElement.value = "";
 var fileChooserElement = document.querySelector("#file_choser");
 // OCR engine
 var ocrSelect = document.querySelector("#ocr");
+var recognizeButton = document.querySelector("#bottom_buttons");
 var getLangs = null;
 var enableTesseractOCR = true;
 var enablePaddleOCR = true;
@@ -910,6 +911,7 @@ async function initElectron() {
 
 async function loadLangOptions() {
     // display none while not loaded
+    recognizeButton.style.display = "none";
     tesseractOcrLangChoser.style.display = "none";
     tesseractOcrPsmChoser.style.display = "none";
     paddleOcrLangChoser.style.display = "none";
@@ -940,6 +942,7 @@ async function loadLangOptions() {
             option.innerText = lang;
             tesseractOcrLangChoserSelect.append(option);
         }
+        recognizeButton.style.display = "block";
         tesseractOcrLangChoser.style.display = "block";
         tesseractOcrPsmChoser.style.display = "block";
     }
@@ -960,6 +963,7 @@ async function loadLangOptions() {
                 paddleOcrLangChoserSelect.append(option);
             }
         }
+        recognizeButton.style.display = "block";
         if(!enableTesseractOCR || getLangs.langs == "") {
             paddleOcrLangChoser.style.display = "block";
             paddleOcrMultiline.style.display = "block";
