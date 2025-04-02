@@ -1,8 +1,8 @@
 {
   "name": "read_subtitles_from_image",
   "description": "The application to get text from subtitles integrated in image.",
-  "version": "1.0.0",
-  "main": "app.js",
+  "version": "1.1.0",
+  "main": "main.py",
   "scripts": {
     "dev_vite": "npm-run-all --parallel vite open_vite_browser",
     "dev_fastapi": "fastapi dev ./main.py --port 7000",
