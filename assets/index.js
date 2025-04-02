@@ -120,6 +120,15 @@ var OCRSettings;
 var OCRSettingsT;
 
 async function init() {
+    // for electron version only
+    // load electron settings first
+    if(isElectron()) {
+        await initElectron();
+    }
+    // load languages
+    loadLangOptions();
+    
+    // load the app
     camera = new THREE.Camera();
     camera.position.z = 0.001;
 
@@ -970,14 +979,6 @@ async function loadLangOptions() {
         }
     }
 }
-
-// for electron version only
-// load electron settings first
-if(isElectron()) {
-    await initElectron();
-}
-
-loadLangOptions();
 
 init();
 
