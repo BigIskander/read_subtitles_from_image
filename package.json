@@ -4,19 +4,15 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "dev": "npm-run-all --parallel vite open_vite_browser express_dev",
-    "build": "npx vite build && node helpers/copy_assets.js && npm-run-all --parallel express open_express_browser",
-    "just_build": "npx vite build && node helpers/copy_assets.js",
+    "dev_vite": "npm-run-all --parallel vite open_vite_browser",
+    "dev_fastapi": "fastapi dev ./main.py --port 7000",
+    "build": "npx vite build && node helpers/copy_assets.js",
     "vite": "vite",
     "open_vite_browser": "VITE=true node helpers/open_browser.js",
-    "express": "node app.js",
-    "express_dev": "DEV=true nodemon app.js localhost 3000",
-    "open_express_browser": "node helpers/open_browser.js",
     "electron_vite": "DEV=true npm start --prefix ./electron",
     "electron": "npm-run-all --parallel --race vite electron_vite",
     "electron_build": "npm run build --prefix ./electron",
     "electron_build_win": "npm run build_win --prefix ./electron",
-    "start": "npm run express",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -30,14 +26,10 @@
   },
   "homepage": "https://github.com/BigIskander/read_subtitles_from_image#readme",
   "dependencies": {
-    "body-parser": "^1.20.3",
-    "cors": "^2.8.5",
-    "express": "^4.21.2",
     "is-electron": "^2.2.2",
     "three": "^0.171.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.9",
     "npm-run-all": "^4.1.5",
     "open-browsers": "^1.3.0",
     "vite": "^6.0.6"
