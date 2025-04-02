@@ -108,8 +108,19 @@ def create_item(requestData: rcognizeRequest):
         except Exception as e:
             return { "err": str(e), "data": "" }
 
-# serve static files
-app.mount("/", StaticFiles(directory="dist", html=True), name="static")
+try:
+    # serve static files
+    app.mount("/", StaticFiles(directory="dist", html=True), name="static")
+except Exception as e:  
+    if len(sys.argv) >=2:
+        if sys.argv[1] == "dev":
+            print("failed to mount static files")
+        else:
+            # failed to mount static files
+            raise Exception("failed to mount static files")
+    else:
+        # failed to mount static files
+        raise Exception("failed to mount static files")
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", "8080"))
