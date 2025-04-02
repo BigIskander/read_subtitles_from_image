@@ -30,8 +30,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
 // recognize text using Tesseract OCR
 async function recognizeTesseractOcr(imageBuffer, lang, psmValue) {
     // run tesseract
-    var tesseract = "tesseract";
+    var tesseract = tesseractPath ? path.join(tesseractPath, "tesseract") : "tesseract";
     var commandArgs = ["-l", lang, "--dpi", "96", "--psm", psmValue, "--oem", "3", "-", "stdout"];
+    if(tessdatadir) {
+        commandArgs.splice(0, 0, "--tessdata-dir");
+        commandArgs.splice(1, 0, tessdatadir);
+    }
     var tesseractProcess = childProcess.spawn(tesseract, commandArgs);
     // get results
     var result = await new Promise(async (resolve) => {
