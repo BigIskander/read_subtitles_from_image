@@ -62,12 +62,16 @@ async function recognizeTesseractOcr(imageBuffer, lang, psmValue) {
 async function recognizePaddleOcr(imageBuffer, lang, multiline) {
     // run PaddleOCR
     var python3 = "python3";
-    var script = path.join(process.cwd(), "run_paddle_ocr.py");
+    if(process.env.DEV == 'true')
+        var script = path.join(__dirname, "run_paddle_ocr.py");
+    else
+        var script = path.join(__dirname, "..", "run_paddle_ocr.py");
     var commandArgs = [script, lang];
     if(multiline) commandArgs.push("multiline");
     var paddleProcess = childProcess.spawn(python3, commandArgs);
     // get results
     var output = "";
+    var error = "";
     var result = await new Promise(async (resolve) => {
         paddleProcess.on('error', (err) => { resolve({ err: err.toString(), data: "" }); });
         paddleProcess.on('close', (code) => { 
@@ -75,7 +79,8 @@ async function recognizePaddleOcr(imageBuffer, lang, multiline) {
                 if(output.length > 0) output = output.slice(0, -1);
                 resolve({ err: "", data: output });
             } else {
-                resolve({ err: "PaddleOCR, python3 script closed with status: " + code, data: "" });
+                resolve({ err: "PaddleOCR, python3 script closed with status: " + 
+                    code + "\n" + error, data: "" });
             } 
         });
         paddleProcess.stdout.on('data', function (data) {
@@ -90,6 +95,7 @@ async function recognizePaddleOcr(imageBuffer, lang, multiline) {
         });
         paddleProcess.stderr.on('data', (err) => {
             // parse stderr
+            error = err;
             var re = /Error:(?<w>.{0,})/;
             var find = err.toString().match(re);
             if(find != null) {

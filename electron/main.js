@@ -68,9 +68,9 @@ if (!gotTheLock) {
 } else {
   app.on('second-instance', (event, commandLine, workingDirectory) => {
     // Someone tried to run a second instance, we should focus our window.
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) mainWindow.restore();
-      mainWindow.focus();
+    if (win) {
+      if (win.isMinimized()) win.restore();
+      win.focus();
     }
   })
   // Create myWindow, load the rest of the app, etc...
