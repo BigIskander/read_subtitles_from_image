@@ -104,8 +104,8 @@ async function recognizePaddleOcr(imageBuffer, lang, multiline) {
 
 var enableTesseractOCR = true;
 var enablePaddleOCR = true;
-var langs = ["chi_all", "eng", "eng"]
-var langsPaddle = ["ch", "en", "chinese_cht", "en"]
+var langs = ["chi_all", "eng"];
+var langsPaddle = ["ch", "en", "chinese_cht"];
 // var language = "chi_all";
 var tessdatadir = null;
 var tesseractPath = null;
