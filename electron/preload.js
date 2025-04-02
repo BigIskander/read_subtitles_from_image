@@ -170,10 +170,17 @@ contextBridge.exposeInMainWorld('OCR', {
         }
     },
     saveSettings: (settings) => {
+        // get values from settings
         settings.langs = settings.langs.replace(/(?:\s)/g, '').
             split(";").filter(item => item!="");
         settings.langsPaddle = settings.langsPaddle.replace(/(?:\s)/g, '').
             split(";").filter(item => item!="");
+        enableTesseractOCR = settings.enableTesseractOCR;
+        enablePaddleOCR = settings.enablePaddleOCR;  
+        langs = settings.langs;
+        langsPaddle = settings.langsPaddle;
+        tessdatadir = settings.tessdatadir;
+        tesseractPath = settings.tesseractPath;
         storage.setItem("settings", settings);
     },
     choseFolder: () => { return ipcRenderer.invoke('choose-directory'); }
