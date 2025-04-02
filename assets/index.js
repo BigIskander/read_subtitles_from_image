@@ -908,7 +908,7 @@ async function loadLangOptions() {
     // load options
     ocrSelect.innerHTML = "";
     // Tesseract OCR
-    if(enableTesseractOCR) {
+    if(enableTesseractOCR && getLangs.langs != "") {
         var option = document.createElement("option");
         option.value = "TesseractOCR";
         option.innerText = "Tesseract OCR";
@@ -925,7 +925,7 @@ async function loadLangOptions() {
         tesseractOcrPsmChoser.style.display = "block";
     }
     // PaddleOCR
-    if(enablePaddleOCR) {
+    if(enablePaddleOCR && getLangs.langsPaddle!= "") {
         var option = document.createElement("option");
         option.value = "PaddleOCR";
         option.innerText = "PaddleOCR";
@@ -941,7 +941,7 @@ async function loadLangOptions() {
                 paddleOcrLangChoserSelect.append(option);
             }
         }
-        if(!enableTesseractOCR) {
+        if(!enableTesseractOCR || getLangs.langs == "") {
             paddleOcrLangChoser.style.display = "block";
             paddleOcrMultiline.style.display = "block";
         }
