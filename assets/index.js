@@ -839,6 +839,25 @@ function langsPaddleUpdated() {
 }
 
 // for electron version only
+function langsHelpMessage() {
+    showMessage("\
+        List of the languages separated by semicolon (;) available for Tesseract OCR. \n\
+        Name of the language corresponst to the name of .traineddata file (without extension). \n\
+        Default value is: chi_all;eng; \
+    ");
+}
+
+// for electron version only
+function langsPaddleHelpMessage() {
+    showMessage("\
+        List of the languages separated by semicolon (;) available for PaddleOCR. \n\
+        Name of the language corresponst to the abbreviation. \n\
+        List of supported languages: https://paddlepaddle.github.io/PaddleOCR/main/en/ppocr/blog/multi_languages.html#5-support-languages-and-abbreviations \n\
+        Default value is: ch;en;chinese_cht; \
+    ");
+}
+
+// for electron version only
 function saveSettings() {
     if(OCRSettingsT.langs != langsElement.value) 
         langsUpdated();
@@ -971,10 +990,11 @@ export {
     enablePaddleOCRChanged,
     langsUpdated,
     langsPaddleUpdated,
+    langsHelpMessage,
+    langsPaddleHelpMessage,
     choseFolder,
     clearFolder,
-    saveSettings,
-    showMessage
+    saveSettings
 }
 
 // dinamic line geometry example

@@ -17,11 +17,12 @@
       var enablePaddleOCRChanged;
       var langsUpdated;
       var langsPaddleUpdated;
+      var langsHelpMessage;
+      var langsPaddleHelpMessage;
       var choseFolder;
       var clearFolder;
       var saveSettings;
       var changeOcr;
-      var showMessage;
     </script>
     <script type="module" defer>
       (async () => {
@@ -37,11 +38,12 @@
         enablePaddleOCRChanged = main.enablePaddleOCRChanged;
         langsUpdated = main.langsUpdated;
         langsPaddleUpdated = main.langsPaddleUpdated;
+        langsHelpMessage = main.langsHelpMessage;
+        langsPaddleHelpMessage = main.langsPaddleHelpMessage;
         choseFolder = main.choseFolder;
         clearFolder = main.clearFolder;
         saveSettings = main.saveSettings;
         changeOcr = main.changeOcr;
-        showMessage = main.showMessage;
       })();
     </script>
   </head>
@@ -112,11 +114,11 @@
         <div>Use PaddleOCR: <input id="enable_Paddle_OCR" type="checkbox" onchange="enablePaddleOCRChanged()" checked></div>
         <div>Tesseract languages: 
           <input id="langs_element" type="text" maxlength="50" value="chi_all;eng;" onchange="langsUpdated()">
-          (<a href="JavaScript:void(0);" onclick="showMessage('super test message 22')">?</a>)
+          (<a href="JavaScript:void(0);" onclick="langsHelpMessage()">?</a>)
         </div>
         <div>PaddleOCR languages:
           <input id="langs_paddle_element" type="text" maxlength="50" value="ch;en;chinese_cht;" onchange="langsPaddleUpdated()" focusable="true">
-          (<a href="JavaScript:void(0);" onclick="showMessage('super test message 33')">?</a>)
+          (<a href="JavaScript:void(0);" onclick="langsPaddleHelpMessage()">?</a>)
         </div>
         <div>
           Tesseract path: <em id="tesseract_path">empty value</em>
