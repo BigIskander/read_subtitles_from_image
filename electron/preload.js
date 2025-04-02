@@ -133,9 +133,9 @@ contextBridge.exposeInMainWorld('OCR', {
         var settings = await storage.getItem("settings");
         if(settings) {
             // get values from settings
-            enableTesseractOCR = settings.enableTesseractOCR ? 
+            enableTesseractOCR = settings.enableTesseractOCR != undefined ? 
                 settings.enableTesseractOCR : enableTesseractOCR;
-            enablePaddleOCR = settings.enablePaddleOCR ?
+            enablePaddleOCR = settings.enablePaddleOCR != undefined ?
                 settings.enablePaddleOCR : enablePaddleOCR; 
             langs = settings.langs ? settings.langs : settings.language ?
                 [settings.language] : langs;
