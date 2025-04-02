@@ -128,9 +128,18 @@ contextBridge.exposeInMainWorld('OCR', {
         await storage.init({ dir: storageDir });
         var settings = await storage.getItem("settings");
         if(settings) {
-            language = settings.language;
-            tessdatadir = settings.tessdatadir;
-            tesseractPath = settings.tesseractPath;
+            // get values from settings
+            enableTesseractOCR = settings.enableTesseractOCR ? 
+                settings.enableTesseractOCR : enableTesseractOCR;
+            enablePaddleOCR = settings.enablePaddleOCR ?
+                settings.enablePaddleOCR : enablePaddleOCR; 
+            langs = settings.langs ? settings.langs : settings.language ?
+                [settings.language] : langs;
+            langsPaddle = settings.langsPaddle ? settings.langsPaddle : langsPaddle;
+            tessdatadir = settings.tessdatadir ? settings.tessdatadir : tessdatadir;
+            tesseractPath = settings.tesseractPath ?
+                settings.tesseractPath : tesseractPath;
+            // return settings
             return { 
                 enableTesseractOCR: enableTesseractOCR,
                 enablePaddleOCR: enablePaddleOCR,
@@ -138,7 +147,6 @@ contextBridge.exposeInMainWorld('OCR', {
                 langsPaddle: langsPaddle,
                 tesseractPath: tesseractPath, 
                 tessdatadir: tessdatadir, 
-                // language: language 
             }; 
         } else {
             return { 
@@ -148,16 +156,15 @@ contextBridge.exposeInMainWorld('OCR', {
                 langsPaddle: langsPaddle,
                 tesseractPath: tesseractPath, 
                 tessdatadir: tessdatadir, 
-                // language: language 
             }; 
         }
     },
     saveSettings: (settings) => {
-        console.log(settings); 
-        // tesseractPath = settings.tesseractPath;
-        // tessdatadir = settings.tessdatadir;
-        // language = settings.language;
-        // storage.setItem("settings", settings);
+        settings.langs = settings.langs.replace(/(?:\s)/g, '').
+            split(";").filter(item => item!="");
+        settings.langsPaddle = settings.langsPaddle.replace(/(?:\s)/g, '').
+            split(";").filter(item => item!="");
+        storage.setItem("settings", settings);
     },
     choseFolder: () => { return ipcRenderer.invoke('choose-directory'); }
 });
