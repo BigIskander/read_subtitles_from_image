@@ -215,7 +215,7 @@ async function init() {
         vertexShader = await load_shader("./assets/shader.vert");
         fragmentShaderF = await load_shader("./assets/shader.frag");
     } catch(error) {
-        alert("Failed to load shader, please try to reload the page!\nerror: " + error);
+        showMessage("Failed to load shader, please try to reload the page!\nerror: " + error);
         console.log(error);
         return;
     }
@@ -535,12 +535,12 @@ async function pasteAnImage() {
                 };
                 image.src = URL.createObjectURL(blob);
             } else {
-                alert("Not an image.");
+                showMessage("Not an image.");
             }
         }
-        if(clipboardContents.length < 1) alert("Nothing in clipboard.");
+        if(clipboardContents.length < 1) showMessage("Nothing in clipboard.");
     } catch (error) {
-        alert(error.message);
+        showMessage(error.message);
     }
 }
 
@@ -558,7 +558,7 @@ async function openAnImage(event) {
                 'image/webp', 'image/bmp', 'image/x-icon', 'image/tiff'
     ];
     if (!supportedFileTypes.includes(imageFile['type'])) {
-        alert("Not an image.");
+        showMessage("Not an image.");
         return;
     }
     // if it is an image
@@ -711,9 +711,9 @@ async function recognizeText() {
             resultStatusElement.style.color = "#ff0000";
             resultStatusElement.innerHTML = "An error occurred.";
             if(usePaddleOcr)
-                alert("PaddleOCR error: " + getResult.err);
+                showMessage("PaddleOCR error: " + getResult.err);
             else
-                alert("Tesseract OCR error: " + getResult.err);
+                showMessage("Tesseract OCR error: " + getResult.err);
             console.log(getResult.err);
         } else {
             var text = getResult.data;
@@ -725,7 +725,7 @@ async function recognizeText() {
     } catch (error) {
         resultStatusElement.style.color = "#ff0000";
         resultStatusElement.innerHTML = "An error occurred.";
-        alert(error.message);
+        showMessage(error.message);
         console.log(error.message);
     }
 }
@@ -930,7 +930,7 @@ async function loadLangOptions() {
         try {
             getLangs = JSON.parse(await load_langs());
         } catch(error) {
-            alert("Failed to get list of languages, please try to reload the page!\nerror: " + error);
+            showMessage("Failed to get list of languages, please try to reload the page!\nerror: " + error);
             console.log(error);
             return;
         }
