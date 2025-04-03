@@ -976,6 +976,7 @@ async function loadLangOptions() {
             paddleOcrMultiline.style.display = "block";
         }
     }
+    if(ocrSelect.length > 0) ocrSelect.value = ocrSelect[0].value;
 }
 
 init();
