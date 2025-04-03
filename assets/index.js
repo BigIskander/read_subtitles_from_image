@@ -17,7 +17,6 @@ const server_host = import.meta.env.PROD ? document.location.origin : "http://lo
 var camera, scene, renderer, clock, renderTarget, renderTargetF, sceneRTT, sceneRTTF;
 var clicked = false;
 var isInit = false;
-var usePaddleOcr = false;
 
 function load_shader(file_url) {
     return new Promise(async (resolve, reject) => {
@@ -625,13 +624,11 @@ function relativeToPixel(xy) {
 // change OCR engine
 function changeOcr() {
     if(ocrSelect.value == "PaddleOCR") {
-        usePaddleOcr = true;
         tesseractOcrLangChoser.style.display = "none";
         tesseractOcrPsmChoser.style.display = "none";
         paddleOcrLangChoser.style.display = "block"; 
         paddleOcrMultiline.style.display = "block";
     } else {
-        usePaddleOcr = false;
         tesseractOcrLangChoser.style.display = "block";
         tesseractOcrPsmChoser.style.display = "block";
         paddleOcrLangChoser.style.display = "none";
@@ -700,7 +697,7 @@ async function recognizeText() {
     ctx.putImageData(imageData, 0, 0, 0, 0, width, height);
     // testImage.src = imageCanvas.toDataURL("image/png");
     var base64image = imageCanvas.toDataURL("image/png");
-    usePaddleOcr = (ocrSelect.value == "PaddleOCR");
+    var usePaddleOcr = (ocrSelect.value == "PaddleOCR");
     var lang = usePaddleOcr ? paddleOcrLangChoserSelect.value : tesseractOcrLangChoserSelect.value;
     var psmValue = psm.value;
     var multiline = paddleOcrMultilineCheckbox.checked;
