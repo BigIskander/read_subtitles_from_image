@@ -700,6 +700,7 @@ async function recognizeText() {
     ctx.putImageData(imageData, 0, 0, 0, 0, width, height);
     // testImage.src = imageCanvas.toDataURL("image/png");
     var base64image = imageCanvas.toDataURL("image/png");
+    usePaddleOcr = (ocrSelect.value == "PaddleOCR");
     var lang = usePaddleOcr ? paddleOcrLangChoserSelect.value : tesseractOcrLangChoserSelect.value;
     var psmValue = psm.value;
     var multiline = paddleOcrMultilineCheckbox.checked;
