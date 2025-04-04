@@ -859,7 +859,7 @@ function langsPaddleUpdated() {
 function langsHelpMessage() {
     showMessage("\
         List of the languages separated by semicolon (;) available for Tesseract OCR. \n\
-        Name of the language corresponst to the name of .traineddata file (without extension). \n\
+        Name of the language corresponds to the name of .traineddata file (without extension). \n\
         Default value is: chi_all;eng; \
     ");
 }
@@ -868,7 +868,7 @@ function langsHelpMessage() {
 function langsPaddleHelpMessage() {
     showMessage("\
         List of the languages separated by semicolon (;) available for PaddleOCR. \n\
-        Name of the language corresponst to the abbreviation. \n\
+        Name of the language corresponds to the abbreviation. \n\
         List of supported languages: \n\
         https://paddlepaddle.github.io/PaddleOCR/main/en/ \n\
         \t ppocr/blog/multi_languages.html \n\
