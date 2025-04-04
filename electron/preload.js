@@ -30,7 +30,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 // recognize text using Tesseract OCR
 async function recognizeTesseractOcr(imageBuffer, lang, psmValue) {
     // run tesseract
-    var tesseract = tesseractPath ? path.join(tesseractPath, "tesseract") : "tesseract";
+    var tesseract = tesseractPath ? tesseractPath : "tesseract";
     var commandArgs = ["-l", lang, "--dpi", "96", "--psm", psmValue, "--oem", "3", "-", "stdout"];
     if(tessdatadir) {
         commandArgs.splice(0, 0, "--tessdata-dir");
@@ -61,7 +61,7 @@ async function recognizeTesseractOcr(imageBuffer, lang, psmValue) {
 // recognize text using PaddleOCR
 async function recognizePaddleOcr(imageBuffer, lang, multiline) {
     // run PaddleOCR
-    var python3 = "python3";
+    var python3 = python3Path ? python3Path : "python3";
     if(process.env.DEV == 'true')
         var script = path.join(__dirname, "run_paddle_ocr.py");
     else
