@@ -869,7 +869,10 @@ function langsPaddleHelpMessage() {
     showMessage("\
         List of the languages separated by semicolon (;) available for PaddleOCR. \n\
         Name of the language corresponst to the abbreviation. \n\
-        List of supported languages: https://paddlepaddle.github.io/PaddleOCR/main/en/ppocr/blog/multi_languages.html#5-support-languages-and-abbreviations \n\
+        List of supported languages: \n\
+        https://paddlepaddle.github.io/PaddleOCR/main/en/ \n\
+        \t ppocr/blog/multi_languages.html \n\
+        \t #5-support-languages-and-abbreviations \n\
         Default value is: ch;en;chinese_cht; \
     ");
 }
