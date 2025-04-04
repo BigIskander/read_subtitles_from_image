@@ -8,6 +8,8 @@ const storageDir = path.join(os.homedir() + "/.read_subtitles_from_image_electro
 const fixPath = (...args) => import('fix-path').then(({default: fixPath}) => fixPath(...args));
 //Fix for mac OS and Linux
 fixPath();
+//Fix for Windows encoding issue
+process.env.PYTHONIOENCODING = "utf-8";
 
 const allowedURLs = [
     'https://github.com/BigIskander/read_subtitles_from_image'
