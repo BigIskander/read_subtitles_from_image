@@ -55,9 +55,19 @@ const createWindow = () => {
   });
 }
 
-//Chosing the directory
-ipcMain.handle('choose-directory', async () => {
-  return dialog.showOpenDialogSync(win, { properties: ['openDirectory']});
+//Chosing the path
+ipcMain.handle('choose-directory', async (event, isDirectory = true) => {
+  if(isDirectory) {
+    return dialog.showOpenDialogSync(win, { properties: ['openDirectory'] });
+  } else {
+    return dialog.showOpenDialogSync(win, { 
+      properties: ['openFile'],
+      filters: [
+        { name: '.exe', extensions: ['exe'] },
+        { name: 'All Files', extensions: ['*'] }
+      ]
+    });
+  }
 });
 
 // start the app and allow only one copy of app running

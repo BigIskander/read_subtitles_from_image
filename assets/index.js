@@ -113,6 +113,7 @@ var langsElement = document.querySelector("#langs_element");
 var langsPaddleElement = document.querySelector("#langs_paddle_element");
 var tesseractPath = document.querySelector("#tesseract_path");
 var tessdatadir = document.querySelector("#tessdatadir");
+var python3Path = document.querySelector("#python3_path");
 // var language = document.querySelector("#tesseract_language");
 var psm = document.querySelector("#psm");
 var OCRSettings;
@@ -778,7 +779,7 @@ function copySettings(from, to) {
     to.langsPaddle = from.langsPaddle;
     to.tesseractPath = from.tesseractPath;
     to.tessdatadir = from.tessdatadir;
-    // to.language = from.language;
+    to.python3Path = from.python3Path;
 }
 
 // for electron version only
@@ -789,7 +790,7 @@ function displaySettings(settingS) {
     langsPaddleElement.value = settingS.langsPaddle;
     tesseractPath.innerHTML = settingS.tesseractPath == null ? "empty value" : settingS.tesseractPath;
     tessdatadir.innerHTML = settingS.tessdatadir == null ? "empty value" : settingS.tessdatadir;
-    // language.value = settingS.language;
+    python3Path.innerHTML = settingS.python3Path == null ? "empty value" : settingS.python3Path;
 }
 
 // for electron version only
@@ -806,21 +807,29 @@ function settingsShowHide() {
 }
 
 // for electron version only
-async function choseFolder(isTesseractPath = true) {
-    var folder = await window.OCR.choseFolder();
-    if(folder) {
-        if(isTesseractPath) 
-            OCRSettingsT.tesseractPath = folder[0];
-        else 
-            OCRSettingsT.tessdatadir = folder[0];
-        displaySettings(OCRSettingsT);
+async function chosePath(type) {
+    if(type == "tesseract_exe" || type == "python3_exe") {
+        var path = await window.OCR.choseFolder(false);
+        if(path) {
+            if(type == "tesseract_exe")
+                OCRSettingsT.tesseractPath = path[0];
+            else
+                OCRSettingsT.python3Path = path[0];
+        }
+    } else {
+        var path = await window.OCR.choseFolder(true);
+        if(path)
+            OCRSettingsT.tessdatadir = path[0];
     }
+    displaySettings(OCRSettingsT);
 }
 
 // for electron version only
-function clearFolder(isTesseractPath = true) {
-    if(isTesseractPath)
+function clearPath(type) {
+    if(type == "tesseract_exe") 
         OCRSettingsT.tesseractPath = null;
+    else if(type == "python3_exe")
+        OCRSettingsT.python3Path = null;
     else
         OCRSettingsT.tessdatadir = null;
     displaySettings(OCRSettingsT);
@@ -911,7 +920,7 @@ async function initElectron() {
         langsPaddle: OCRSettings.langsPaddle,
         tesseractPath: OCRSettings.tesseractPath,
         tessdatadir: OCRSettings.tessdatadir,
-        // language: OCRSettings.language
+        python3Path: OCRSettings.python3Path
     };
     displaySettings(OCRSettingsT);
 }
@@ -996,8 +1005,8 @@ export {
     langsPaddleUpdated,
     langsHelpMessage,
     langsPaddleHelpMessage,
-    choseFolder,
-    clearFolder,
+    chosePath,
+    clearPath,
     saveSettings
 }
 

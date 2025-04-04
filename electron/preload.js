@@ -115,6 +115,7 @@ var langsPaddle = ["ch", "en", "chinese_cht"];
 // var language = "chi_all";
 var tessdatadir = null;
 var tesseractPath = null;
+var python3Path = null;
 
 // tesseract OCR
 contextBridge.exposeInMainWorld('OCR', {
@@ -149,6 +150,8 @@ contextBridge.exposeInMainWorld('OCR', {
             tessdatadir = settings.tessdatadir ? settings.tessdatadir : tessdatadir;
             tesseractPath = settings.tesseractPath ?
                 settings.tesseractPath : tesseractPath;
+            python3Path = settings.python3Path ?
+                settings.python3Path : python3Path;
             // return settings
             return { 
                 enableTesseractOCR: enableTesseractOCR,
@@ -157,6 +160,7 @@ contextBridge.exposeInMainWorld('OCR', {
                 langsPaddle: langsPaddle,
                 tesseractPath: tesseractPath, 
                 tessdatadir: tessdatadir, 
+                python3Path: python3Path
             }; 
         } else {
             return { 
@@ -166,6 +170,7 @@ contextBridge.exposeInMainWorld('OCR', {
                 langsPaddle: langsPaddle,
                 tesseractPath: tesseractPath, 
                 tessdatadir: tessdatadir, 
+                python3Path: python3Path
             }; 
         }
     },
@@ -181,9 +186,10 @@ contextBridge.exposeInMainWorld('OCR', {
         langsPaddle = settings.langsPaddle;
         tessdatadir = settings.tessdatadir;
         tesseractPath = settings.tesseractPath;
+        python3Path = settings.python3Path;
         storage.setItem("settings", settings);
     },
-    choseFolder: () => { return ipcRenderer.invoke('choose-directory'); }
+    choseFolder: (isDirectory) => { return ipcRenderer.invoke('choose-directory', isDirectory); }
 });
 
 // a little trick to load ES module in commonJS

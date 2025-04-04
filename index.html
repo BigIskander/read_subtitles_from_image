@@ -19,8 +19,8 @@
       var langsPaddleUpdated;
       var langsHelpMessage;
       var langsPaddleHelpMessage;
-      var choseFolder;
-      var clearFolder;
+      var chosePath;
+      var clearPath;
       var saveSettings;
       var changeOcr;
     </script>
@@ -40,8 +40,8 @@
         langsPaddleUpdated = main.langsPaddleUpdated;
         langsHelpMessage = main.langsHelpMessage;
         langsPaddleHelpMessage = main.langsPaddleHelpMessage;
-        choseFolder = main.choseFolder;
-        clearFolder = main.clearFolder;
+        chosePath = main.chosePath;
+        clearPath = main.clearPath;
         saveSettings = main.saveSettings;
         changeOcr = main.changeOcr;
       })();
@@ -121,18 +121,25 @@
           (<a href="JavaScript:void(0);" onclick="langsPaddleHelpMessage()">?</a>)
         </div>
         <div>
-          Tesseract path: <em id="tesseract_path">empty value</em>
+          Tesseract executable: <em id="tesseract_path">empty value</em>
         </div>
         <div>
-          <a href="JavaScript:void(0);" onclick="choseFolder()">chose folder</a> || 
-          <a href="JavaScript:void(0);" onclick="clearFolder()">set empty value</a>
+          <a href="JavaScript:void(0);" onclick="chosePath('tesseract_exe')">chose path</a> || 
+          <a href="JavaScript:void(0);" onclick="clearPath('tesseract_exe')">set empty value</a>
         </div>
         <div>
           Tesseract tessdatadir: <em id="tessdatadir">empty value</em>
         </div>
         <div>
-          <a href="JavaScript:void(0);" onclick="choseFolder(false)">chose folder</a> || 
-          <a href="JavaScript:void(0);" onclick="clearFolder(false)">set empty value</a>
+          <a href="JavaScript:void(0);" onclick="chosePath()">chose path</a> || 
+          <a href="JavaScript:void(0);" onclick="clearPath()">set empty value</a>
+        </div>
+        <div>
+          Python 3 executable: <em id="python3_path">empty value</em>
+        </div>
+        <div>
+          <a href="JavaScript:void(0);" onclick="chosePath('python3_exe')">chose path</a> || 
+          <a href="JavaScript:void(0);" onclick="clearPath('python3_exe')">set empty value</a>
         </div>
         <div style="margin-top: 10px;"><a href="JavaScript:void(0);" onclick="saveSettings()">Save settings.</a></div>
       </div>
