@@ -54,13 +54,13 @@ By default language is set up as chi_all, .traineddata file for which, can be do
     ```
 3. in program settings choose the path of **python.exe** (or **python** in Linux and MacOS) file. You can find file location by executing this commands:
     
-    в Window и MacOS
+    in Window and MacOS
     ```
     conda activate paddle_env
     where python
     ```
 
-    в Linux
+    in Linux
     ```
     conda activate paddle_env
     which python
