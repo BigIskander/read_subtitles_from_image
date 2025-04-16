@@ -5,6 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from subprocess import Popen, PIPE
 from paddleocr import PaddleOCR
+# to sort the results
+from functools import cmp_to_key
 
 # get env variables
 envTesslangs = [
@@ -50,6 +52,17 @@ class rcognizeRequest(BaseModel):
     lang: str
     psmValue: int 
     multiline: bool
+
+# is positions or text results one line or not
+def is_paddleocr_result_positions_inline(bbox1, bbox2):
+    return not (bbox1[0][1][1] > bbox2[0][3][1] or bbox1[0][3][1] < bbox2[0][1][1])
+
+# compare paddle ocr results to sort them
+def compare_paddleocr_result_positions(bbox1, bbox2):
+    if is_paddleocr_result_positions_inline(bbox1, bbox2):
+        return bbox1[0][0][0] - bbox2[0][0][0]
+    else:
+        return bbox1[0][0][1] - bbox2[0][0][1]
 
 @app.post("/recognize")
 def create_item(requestData: rcognizeRequest):
@@ -99,8 +112,19 @@ def create_item(requestData: rcognizeRequest):
                 res = result[idx]
                 if res:
                     if det:
+                        res = sorted(res, key=cmp_to_key(compare_paddleocr_result_positions))
+                        res = sorted(res, key=cmp_to_key(compare_paddleocr_result_positions))
+                        prev = None
                         for line in res:
-                            output = output + line[1][0] + "\n"
+                            if prev != None:
+                                if is_paddleocr_result_positions_inline(line, prev):
+                                    output = output + "\t" + line[1][0]
+                                else:
+                                    output = output + "\n" + line[1][0]
+                            else:
+                                output = line[1][0]
+                            prev = line
+                        output = output + "\n"
                     else:
                         for line in res:
                             output = output + line[0] + "\n"
