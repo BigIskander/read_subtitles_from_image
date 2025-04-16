@@ -2,7 +2,7 @@ version: '3.5'
 services:
   server:
     container_name: read_subtitles_from_image
-    image: bigiskander/read_subtitles_from_image:1.1.0
+    image: bigiskander/read_subtitles_from_image:1.1.1
     restart: unless-stopped
     stop_grace_period: 10s
     ports:
