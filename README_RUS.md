@@ -79,6 +79,7 @@ https://github.com/user-attachments/assets/6d610ada-971e-4d68-a9fd-2eb6c52160c4
 
 Далее, установить зависимости:
 ```
+node -v > .nvmrc
 pip install "fastapi[standard]"
 npm install
 cd electron

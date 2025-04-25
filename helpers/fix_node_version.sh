@@ -1,0 +1,1 @@
+if [ \"$(node -v)\" != \"$(cat .nvmrc)\" ]; then . ~/.nvm/nvm.sh; nvm use >/dev/null 2>&1; fi; $1

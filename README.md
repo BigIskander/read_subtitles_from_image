@@ -79,6 +79,7 @@ After that, install necessary OCR programs, look higher.
 
 Then install dependencies:
 ```
+node -v > .nvmrc
 pip install "fastapi[standard]"
 npm install
 cd electron
