@@ -56,6 +56,13 @@ const createWindow = () => {
   });
   // Quit app when now window?
   ipcMain.on('set-quit-no-window', (event, quit) => { quitAppWhenNoWindow = Boolean(quit); });
+  // remove all listeners when window is closed, fix for MacOS
+  win.on('closed', () => {
+    ipcMain.removeAllListeners('show-context-menu');
+    ipcMain.removeAllListeners('show-context-menu2');
+    ipcMain.removeAllListeners('show-message');
+    ipcMain.removeAllListeners('set-quit-no-window');
+  });
 }
 
 //Chosing the path
