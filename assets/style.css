@@ -127,6 +127,9 @@ body {
 #settings_set em {
     font-weight: bold;
 }
+#quitNoWindow {
+    display: none;
+}
 #credits {
     margin-top: 20px;
     margin-bottom: 5px;

@@ -26,7 +26,9 @@ contextBridge.exposeInMainWorld('externalLink', {
 contextBridge.exposeInMainWorld('electronAPI', {
     showContextMenu: (event) => { ipcRenderer.send('show-context-menu', event); },
     showContextMenu2: (event) => { ipcRenderer.send('show-context-menu2', event); },
-    showDialog: (message) => { ipcRenderer.send('show-message', message); }
+    showDialog: (message) => { ipcRenderer.send('show-message', message); },
+    os: () => { return process.platform },
+    setQuitNoWindow: (quit) => { ipcRenderer.send('set-quit-no-window', quit); }
 });
 
 // recognize text using Tesseract OCR
@@ -118,6 +120,7 @@ var langsPaddle = ["ch", "en", "chinese_cht"];
 var tessdatadir = null;
 var tesseractPath = null;
 var python3Path = null;
+var isQuitNoWindow = false;
 
 // tesseract OCR
 contextBridge.exposeInMainWorld('OCR', {
@@ -154,6 +157,8 @@ contextBridge.exposeInMainWorld('OCR', {
                 settings.tesseractPath : tesseractPath;
             python3Path = settings.python3Path ?
                 settings.python3Path : python3Path;
+            isQuitNoWindow = settings.isQuitNoWindow != undefined ?
+                settings.isQuitNoWindow : isQuitNoWindow;
             // return settings
             return { 
                 enableTesseractOCR: enableTesseractOCR,
@@ -162,7 +167,8 @@ contextBridge.exposeInMainWorld('OCR', {
                 langsPaddle: langsPaddle,
                 tesseractPath: tesseractPath, 
                 tessdatadir: tessdatadir, 
-                python3Path: python3Path
+                python3Path: python3Path,
+                isQuitNoWindow: isQuitNoWindow
             }; 
         } else {
             return { 
@@ -172,7 +178,8 @@ contextBridge.exposeInMainWorld('OCR', {
                 langsPaddle: langsPaddle,
                 tesseractPath: tesseractPath, 
                 tessdatadir: tessdatadir, 
-                python3Path: python3Path
+                python3Path: python3Path,
+                isQuitNoWindow: isQuitNoWindow
             }; 
         }
     },
@@ -189,7 +196,10 @@ contextBridge.exposeInMainWorld('OCR', {
         tessdatadir = settings.tessdatadir;
         tesseractPath = settings.tesseractPath;
         python3Path = settings.python3Path;
+        isQuitNoWindow = settings.isQuitNoWindow;
         storage.setItem("settings", settings);
+        if(process.platform === "darwin")
+            ipcRenderer.send('set-quit-no-window', isQuitNoWindow);
     },
     choseFolder: (isDirectory) => { return ipcRenderer.invoke('choose-directory', isDirectory); }
 });

@@ -114,6 +114,8 @@ var langsPaddleElement = document.querySelector("#langs_paddle_element");
 var tesseractPath = document.querySelector("#tesseract_path");
 var tessdatadir = document.querySelector("#tessdatadir");
 var python3Path = document.querySelector("#python3_path");
+var quitNoWindow = document.querySelector("#quitNoWindow");
+var quitNoWindowCheck = document.querySelector("#quitNoWindowCheck");
 // var language = document.querySelector("#tesseract_language");
 var psm = document.querySelector("#psm");
 var OCRSettings;
@@ -780,6 +782,7 @@ function copySettings(from, to) {
     to.tesseractPath = from.tesseractPath;
     to.tessdatadir = from.tessdatadir;
     to.python3Path = from.python3Path;
+    to.isQuitNoWindow = from.isQuitNoWindow;
 }
 
 // for electron version only
@@ -791,6 +794,7 @@ function displaySettings(settingS) {
     tesseractPath.innerHTML = settingS.tesseractPath == null ? "empty value" : settingS.tesseractPath;
     tessdatadir.innerHTML = settingS.tessdatadir == null ? "empty value" : settingS.tessdatadir;
     python3Path.innerHTML = settingS.python3Path == null ? "empty value" : settingS.python3Path;
+    quitNoWindowCheck.checked = settingS.isQuitNoWindow;
 }
 
 // for electron version only
@@ -856,6 +860,11 @@ function langsPaddleUpdated() {
 }
 
 // for electron version only
+function isQuitNoWindowYN() {
+    OCRSettingsT.isQuitNoWindow = quitNoWindowCheck.checked;
+}
+
+// for electron version only
 function langsHelpMessage() {
     showMessage("\
         List of the languages separated by semicolon (;) available for Tesseract OCR. \n\
@@ -908,7 +917,14 @@ async function initElectron() {
     settingsSH.addEventListener("click", settingsShowHide);
     langsElement.addEventListener("contextmenu", window.electronAPI.showContextMenu2);
     langsPaddleElement.addEventListener("contextmenu", window.electronAPI.showContextMenu2);
+    // reading settings from backend
+    var os = await window.electronAPI.os();
     OCRSettings = await window.OCR.initSettings();
+    // for MacOS only quit app when no open window?
+    if(os == "darwin") {
+        if(OCRSettings.isQuitNoWindow) window.electronAPI.setQuitNoWindow(true);
+        quitNoWindow.style.display = "block";
+    }
     enableTesseractOCR = OCRSettings.enableTesseractOCR;
     enablePaddleOCR = OCRSettings.enablePaddleOCR;
     getLangs = { langs: OCRSettings.langs, langsPaddle: OCRSettings.langsPaddle };
@@ -923,7 +939,8 @@ async function initElectron() {
         langsPaddle: OCRSettings.langsPaddle,
         tesseractPath: OCRSettings.tesseractPath,
         tessdatadir: OCRSettings.tessdatadir,
-        python3Path: OCRSettings.python3Path
+        python3Path: OCRSettings.python3Path,
+        isQuitNoWindow: OCRSettings.isQuitNoWindow
     };
     displaySettings(OCRSettingsT);
 }
@@ -1010,6 +1027,7 @@ export {
     langsPaddleHelpMessage,
     chosePath,
     clearPath,
+    isQuitNoWindowYN,
     saveSettings
 }
 

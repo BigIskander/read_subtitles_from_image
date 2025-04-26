@@ -21,6 +21,7 @@
       var langsPaddleHelpMessage;
       var chosePath;
       var clearPath;
+      var isQuitNoWindowYN;
       var saveSettings;
       var changeOcr;
     </script>
@@ -42,6 +43,7 @@
         langsPaddleHelpMessage = main.langsPaddleHelpMessage;
         chosePath = main.chosePath;
         clearPath = main.clearPath;
+        isQuitNoWindowYN = main.isQuitNoWindowYN;
         saveSettings = main.saveSettings;
         changeOcr = main.changeOcr;
       })();
@@ -140,6 +142,10 @@
         <div>
           <a href="JavaScript:void(0);" onclick="chosePath('python3_exe')">chose path</a> || 
           <a href="JavaScript:void(0);" onclick="clearPath('python3_exe')">set empty value</a>
+        </div>
+        <div id="quitNoWindow">
+          Close (quit) app when closing app's window [in MacOS]: 
+          <input id="quitNoWindowCheck" type="checkbox" onchange="isQuitNoWindowYN()">
         </div>
         <div style="margin-top: 10px;"><a href="JavaScript:void(0);" onclick="saveSettings()">Save settings.</a></div>
       </div>

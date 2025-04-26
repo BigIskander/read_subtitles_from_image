@@ -3,6 +3,7 @@ const path = require('path');
 
 const preload = path.join(__dirname, 'preload.js');
 const indexHTML = path.join(__dirname, 'static/index.html');
+var quitAppWhenNoWindow = false;
 
 var win;
 
@@ -53,6 +54,8 @@ const createWindow = () => {
   ipcMain.on('show-message', (event, message) => {
     dialog.showMessageBoxSync(win, { message: message});
   });
+  // Quit app when now window?
+  ipcMain.on('set-quit-no-window', (event, quit) => { quitAppWhenNoWindow = Boolean(quit); });
 }
 
 //Chosing the path
@@ -79,7 +82,12 @@ if (!gotTheLock) {
   app.on('second-instance', (event, commandLine, workingDirectory) => {
     // Someone tried to run a second instance, we should focus our window.
     if (win) {
-      if (win.isMinimized()) win.restore();
+      try {
+        if (win.isMinimized()) win.restore();
+      } catch {
+        // fix minor error for MacOS
+        if(process.platform === 'darwin') createWindow();
+      }  
       win.focus();
     }
   })
@@ -91,7 +99,7 @@ if (!gotTheLock) {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
+  if (process.platform !== 'darwin' || quitAppWhenNoWindow) {
     app.quit();
   }
 });
