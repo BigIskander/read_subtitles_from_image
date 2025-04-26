@@ -31,7 +31,8 @@
     "node-persist": "^4.0.3"
   },
   "build": {
-    "appId": "org.xuexihanzijs.desktop.app",
+    "appId": "org.readsubtitlesfromimage.desktop.app",
+    "icon": "icons",
     "files": [
       "main.js",
       "preload.js",
@@ -45,6 +46,7 @@
     ],
     "extraResources": "run_paddle_ocr.py",
     "win": {
+      "icon": "icons/icon.ico",
       "target": [
         {
           "target": "nsis"
@@ -52,6 +54,7 @@
       ]
     },
     "mac": {
+      "icon": "icons/icon.png",
       "category": "public.app-category.education",
       "target": [
         {
@@ -64,6 +67,7 @@
       ]
     },
     "linux": {
+      "icon": "icons/linux",
       "category": "Education",
       "target": [
         {
