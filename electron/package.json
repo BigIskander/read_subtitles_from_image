@@ -1,6 +1,6 @@
 {
   "name": "read_subtitles_from_image_electron",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "The application to get text from subtitles integrated in image.",
   "main": "main.js",
   "scripts": {
