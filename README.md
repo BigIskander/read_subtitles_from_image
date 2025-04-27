@@ -22,6 +22,8 @@ https://github.com/user-attachments/assets/6d610ada-971e-4d68-a9fd-2eb6c52160c4
 
 For video demonstration I used print screen made from the show [The Beauty Blogger](https://wetv.vip/en/play/qgvq32ixh4yujoc-The%20Beauty%20Blogger/o0029e5dqz9-EP19%EF%BC%9AThe%20Beauty%20Blogger), made when subtitles turned on.
 
+If video is not playing, open this page in Chrome browser.
+
 ## How to install and set up
 
 You can find compiled binaries (installation files) with program in [releases](https://github.com/BigIskander/read_subtitles_from_image/releases) page.

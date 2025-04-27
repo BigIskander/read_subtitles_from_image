@@ -22,6 +22,8 @@ https://github.com/user-attachments/assets/6d610ada-971e-4d68-a9fd-2eb6c52160c4
 
 Для видео демонстрации я использовал снимок с экрана шоу [The Beauty Blogger](https://wetv.vip/en/play/qgvq32ixh4yujoc-The%20Beauty%20Blogger/o0029e5dqz9-EP19%EF%BC%9AThe%20Beauty%20Blogger), сделанный когда субтитры включены.
 
+Если видео не воспроизводиться, откройте эту страницу в браузере Chrome.
+
 ## Как установить и настроить
 
 Вы можете найти уже скомпилированные бинарные (установочные) файлы с программой на странице релизов ([releases](https://github.com/BigIskander/read_subtitles_from_image/releases)).
