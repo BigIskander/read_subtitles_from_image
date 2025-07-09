@@ -15,10 +15,14 @@
       var recognizeText;
       var enableTesseractOCRChanged;
       var enablePaddleOCRChanged;
+      var enableAppleVisionOCRChanged;
       var langsUpdated;
       var langsPaddleUpdated;
+      var langsAppleVisionUpdated;
+      var visionFrameworkUpdated;
       var langsHelpMessage;
       var langsPaddleHelpMessage;
+      var appleVisionLangPrefsHelpMessage;
       var chosePath;
       var clearPath;
       var isQuitNoWindowYN;
@@ -37,10 +41,14 @@
         recognizeText = main.recognizeText;
         enableTesseractOCRChanged = main.enableTesseractOCRChanged;
         enablePaddleOCRChanged = main.enablePaddleOCRChanged;
+        enableAppleVisionOCRChanged = main.enableAppleVisionOCRChanged;
         langsUpdated = main.langsUpdated;
         langsPaddleUpdated = main.langsPaddleUpdated;
+        langsAppleVisionUpdated = main.langsAppleVisionUpdated;
+        visionFrameworkUpdated = main.visionFrameworkUpdated;
         langsHelpMessage = main.langsHelpMessage;
         langsPaddleHelpMessage = main.langsPaddleHelpMessage;
+        appleVisionLangPrefsHelpMessage = main.appleVisionLangPrefsHelpMessage;
         chosePath = main.chosePath;
         clearPath = main.clearPath;
         isQuitNoWindowYN = main.isQuitNoWindowYN;
@@ -114,6 +122,7 @@
       <div id="settings_set" style="margin-top: 10px;">
         <div>Use Tesseract OCR: <input id="enable_Tesseract_OCR" type="checkbox" onchange="enableTesseractOCRChanged()" checked></div>
         <div>Use PaddleOCR: <input id="enable_Paddle_OCR" type="checkbox" onchange="enablePaddleOCRChanged()" checked></div>
+        <div>Use Apple vision OCR: <input id="enable_AppleVision_OCR" type="checkbox" onchange="enableAppleVisionOCRChanged()" checked></div>
         <div>Tesseract languages: 
           <input id="langs_element" type="text" maxlength="50" value="chi_all;eng;" onchange="langsUpdated()">
           (<a href="JavaScript:void(0);" onclick="langsHelpMessage()">?</a>)
@@ -121,6 +130,10 @@
         <div>PaddleOCR languages:
           <input id="langs_paddle_element" type="text" maxlength="50" value="ch;en;chinese_cht;" onchange="langsPaddleUpdated()" focusable="true">
           (<a href="JavaScript:void(0);" onclick="langsPaddleHelpMessage()">?</a>)
+        </div>
+        <div id="langs_aplle_vision_element_wrapper">Apple vision OCR language_preference:
+          <input id="langs_aplle_vision_element" type="text" maxlength="50" value="zh-Hans;en-US;" onchange="langsAppleVisionUpdated()" focusable="true">
+          (<a href="JavaScript:void(0);" onclick="appleVisionLangPrefsHelpMessage()">?</a>)
         </div>
         <div>
           Tesseract executable: <em id="tesseract_path">empty value</em>
@@ -137,11 +150,27 @@
           <a href="JavaScript:void(0);" onclick="clearPath()">set empty value</a>
         </div>
         <div>
-          Python 3 executable: <em id="python3_path">empty value</em>
+          Python 3 executable [paddleocr]: <em id="python3_path">empty value</em>
         </div>
         <div>
           <a href="JavaScript:void(0);" onclick="chosePath('python3_exe')">chose path</a> || 
           <a href="JavaScript:void(0);" onclick="clearPath('python3_exe')">set empty value</a>
+        </div>
+        <div id="ocrmac_wrapper">
+          <div>
+            Python 3 executable [ocrmac]: <em id="python3_path_ocrmac">empty value</em>
+          </div>
+          <div>
+            <a href="JavaScript:void(0);" onclick="chosePath('python3_exe_ocrmac')">chose path</a> || 
+            <a href="JavaScript:void(0);" onclick="clearPath('python3_exe_ocrmac')">set empty value</a>
+          </div>
+            <div>
+            Vision framework [ocrmac]: 
+            <select id="vision_framework" onchange="visionFrameworkUpdated()">
+              <option value="VisionKit">VisionKit</option>
+              <option value="LiveText">LiveText</option>
+            </select>
+          </div>
         </div>
         <div id="quitNoWindow">
           Close (quit) app when closing app's window [in MacOS]: 

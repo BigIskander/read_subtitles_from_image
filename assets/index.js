@@ -93,6 +93,7 @@ var recognizeButton = document.querySelector("#bottom_buttons");
 var getLangs = null;
 var enableTesseractOCR = true;
 var enablePaddleOCR = true;
+var enableAplleVisionOCR = true;
 // Tesseract OCR
 var tesseractOcrLangChoser = document.querySelector("#tesseract_ocr_lang_choser");
 var tesseractOcrLangChoserSelect = document.querySelector("#tesseract_ocr_lang_choser_select");
@@ -109,17 +110,25 @@ var settingsSet = document.querySelector("#settings_set");
 var settingsSH = document.querySelector("#settings_show_hide");
 var enableTesseractOCRElement = document.querySelector("#enable_Tesseract_OCR");
 var enablePaddleOCRElement = document.querySelector("#enable_Paddle_OCR");
+var enableAplleVisionOCRElement = document.querySelector("#enable_AppleVision_OCR");
 var langsElement = document.querySelector("#langs_element");
 var langsPaddleElement = document.querySelector("#langs_paddle_element");
+var langsAppleVisionElement = document.querySelector("#langs_aplle_vision_element");
 var tesseractPath = document.querySelector("#tesseract_path");
 var tessdatadir = document.querySelector("#tessdatadir");
 var python3Path = document.querySelector("#python3_path");
+var python3PathOcrmac = document.querySelector("#python3_path_ocrmac");
+var ocrmacWrapper = document.querySelector("#ocrmac_wrapper");
+var langsAplleVisionElementWrapper = document.querySelector("#langs_aplle_vision_element_wrapper");
+var visionFrameworkElement = document.querySelector("#vision_framework");
 var quitNoWindow = document.querySelector("#quitNoWindow");
 var quitNoWindowCheck = document.querySelector("#quitNoWindowCheck");
 // var language = document.querySelector("#tesseract_language");
 var psm = document.querySelector("#psm");
 var OCRSettings;
 var OCRSettingsT;
+// Operation System
+var os = null;
 
 async function init() {
     // for electron version only
@@ -631,6 +640,11 @@ function changeOcr() {
         tesseractOcrPsmChoser.style.display = "none";
         paddleOcrLangChoser.style.display = "block"; 
         paddleOcrMultiline.style.display = "block";
+    } else if(ocrSelect.value == "AppleVisionOCR") {
+        tesseractOcrLangChoser.style.display = "none";
+        tesseractOcrPsmChoser.style.display = "none";
+        paddleOcrLangChoser.style.display = "none";
+        paddleOcrMultiline.style.display = "none";
     } else {
         tesseractOcrLangChoser.style.display = "block";
         tesseractOcrPsmChoser.style.display = "block";
@@ -700,19 +714,22 @@ async function recognizeText() {
     ctx.putImageData(imageData, 0, 0, 0, 0, width, height);
     // testImage.src = imageCanvas.toDataURL("image/png");
     var base64image = imageCanvas.toDataURL("image/png");
-    var usePaddleOcr = (ocrSelect.value == "PaddleOCR");
+    var ocrEngine = ocrSelect.value;
+    var usePaddleOcr = (ocrEngine == "PaddleOCR");
     var lang = usePaddleOcr ? paddleOcrLangChoserSelect.value : tesseractOcrLangChoserSelect.value;
     var psmValue = psm.value;
     var multiline = paddleOcrMultilineCheckbox.checked;
 
     try {
         // Call to backend and display reselts
-        var getResult = await recognizeTextRequest(usePaddleOcr, base64image, lang, psmValue, multiline);
+        var getResult = await recognizeTextRequest(ocrEngine, base64image, lang, psmValue, multiline);
         if(getResult.err != "") {
             resultStatusElement.style.color = "#ff0000";
             resultStatusElement.innerHTML = "An error occurred.";
-            if(usePaddleOcr)
+            if(ocrEngine == "PaddleOCR")
                 showMessage("PaddleOCR error: " + getResult.err);
+            else if(ocrEngine == "AppleVisionOCR")
+                showMessage("Apple vision OCR error: " + getResult.err);
             else
                 showMessage("Tesseract OCR error: " + getResult.err);
             console.log(getResult.err);
@@ -720,7 +737,7 @@ async function recognizeText() {
             var text = getResult.data;
             // text.replace(/(?:\r\n|\r|\n|\t)/g, ' ').replace(/(?:\s\s+)/g, ' ').trim();
             // slice(0, -1) to delete last unprintable character or symbol
-            resultElement.value = usePaddleOcr ? text : text.slice(0, -1);
+            resultElement.value = (ocrEngine == "TesseractOCR") ? text.slice(0, -1) : text;
             resultStatusElement.innerHTML = "";
         }
     } catch (error) {
@@ -732,7 +749,8 @@ async function recognizeText() {
 }
 
 // request data from backend server
-function recognizeTextRequestFastapi(usePaddleOcr, base64image, lang, psmValue, multiline) {
+function recognizeTextRequestFastapi(ocrEngine, base64image, lang, psmValue, multiline) {
+    var usePaddleOcr = (ocrEngine == "PaddleOCR");
     return new Promise(async (resolve, reject) => {
         try {
             var response = await fetch(server_host + "/recognize", {
@@ -757,9 +775,9 @@ function recognizeTextRequestFastapi(usePaddleOcr, base64image, lang, psmValue, 
 }
 
 // request data from backend electron
-function recognizeTextRequestElectron(usePaddleOcr, base64image, lang, psmValue, multiline) {
+function recognizeTextRequestElectron(ocrEngine, base64image, lang, psmValue, multiline) {
     return new Promise(async (resolve, reject) => {
-        resolve(await window.OCR.recognize(usePaddleOcr, base64image, lang, psmValue, multiline));
+        resolve(await window.OCR.recognize(ocrEngine, base64image, lang, psmValue, multiline));
     });
 }
 
@@ -777,11 +795,15 @@ function showMessageElectron(message) {
 function copySettings(from, to) {
     to.enableTesseractOCR = from.enableTesseractOCR;
     to.enablePaddleOCR = from.enablePaddleOCR;
+    to.enableAplleVisionOCR = from.enableAplleVisionOCR;
     to.langs = from.langs;
     to.langsPaddle = from.langsPaddle;
+    to.visionLangPref = from.visionLangPref;
     to.tesseractPath = from.tesseractPath;
     to.tessdatadir = from.tessdatadir;
     to.python3Path = from.python3Path;
+    to.python3PathOcrmac = from.python3PathOcrmac;
+    to.visionFramework = from.visionFramework;
     to.isQuitNoWindow = from.isQuitNoWindow;
 }
 
@@ -789,11 +811,15 @@ function copySettings(from, to) {
 function displaySettings(settingS) {
     enableTesseractOCRElement.checked = settingS.enableTesseractOCR;
     enablePaddleOCRElement.checked = settingS.enablePaddleOCR;
+    enableAplleVisionOCRElement.checked = settingS.enableAplleVisionOCR;
     langsElement.value = settingS.langs;
     langsPaddleElement.value = settingS.langsPaddle;
+    langsAppleVisionElement.value = settingS.visionLangPref;
     tesseractPath.innerHTML = settingS.tesseractPath == null ? "empty value" : settingS.tesseractPath;
     tessdatadir.innerHTML = settingS.tessdatadir == null ? "empty value" : settingS.tessdatadir;
     python3Path.innerHTML = settingS.python3Path == null ? "empty value" : settingS.python3Path;
+    python3PathOcrmac.innerHTML = settingS.python3PathOcrmac == null ? "empty value" : settingS.python3PathOcrmac;
+    visionFrameworkElement.value = settingS.visionFramework;
     quitNoWindowCheck.checked = settingS.isQuitNoWindow;
 }
 
@@ -812,11 +838,13 @@ function settingsShowHide() {
 
 // for electron version only
 async function chosePath(type) {
-    if(type == "tesseract_exe" || type == "python3_exe") {
+    if(type == "tesseract_exe" || type == "python3_exe" || type == "python3_exe_ocrmac") {
         var path = await window.OCR.choseFolder(false);
         if(path) {
             if(type == "tesseract_exe")
                 OCRSettingsT.tesseractPath = path[0];
+            else if(type == "python3_exe_ocrmac")
+                OCRSettingsT.python3PathOcrmac = path[0];
             else
                 OCRSettingsT.python3Path = path[0];
         }
@@ -834,6 +862,8 @@ function clearPath(type) {
         OCRSettingsT.tesseractPath = null;
     else if(type == "python3_exe")
         OCRSettingsT.python3Path = null;
+    else if(type == "python3_exe_ocrmac")
+        OCRSettingsT.python3PathOcrmac = null;
     else
         OCRSettingsT.tessdatadir = null;
     displaySettings(OCRSettingsT);
@@ -850,6 +880,11 @@ function enablePaddleOCRChanged() {
 }
 
 // for electron version only
+function enableAppleVisionOCRChanged() {
+    OCRSettingsT.enableAplleVisionOCR = enableAplleVisionOCRElement.checked;
+}
+
+// for electron version only
 function langsUpdated() {
     OCRSettingsT.langs = langsElement.value;
 }
@@ -857,6 +892,16 @@ function langsUpdated() {
 // for electron version only
 function langsPaddleUpdated() {
     OCRSettingsT.langsPaddle = langsPaddleElement.value;
+}
+
+// for electron version only
+function langsAppleVisionUpdated() {
+   OCRSettingsT.visionLangPref = langsAppleVisionElement.value;
+}
+
+// for electron version only
+function visionFrameworkUpdated() {
+    OCRSettingsT.visionFramework = visionFrameworkElement.value;
 }
 
 // for electron version only
@@ -887,23 +932,39 @@ function langsPaddleHelpMessage() {
 }
 
 // for electron version only
+function appleVisionLangPrefsHelpMessage() {
+    showMessage("\
+        List of the languages for post-processing separated by semicolon (;). \n\
+        More about it here: \n\
+        https://github.com/straussmaximilian/ocrmac/ \n\
+        Default value is: zh-Hans;en-US; \
+    ");
+}
+
+// for electron version only
 function saveSettings() {
     if(OCRSettingsT.langs != langsElement.value) 
         langsUpdated();
     if(OCRSettingsT.langsPaddle != langsPaddleElement.value) 
         langsPaddleUpdated();
+    if(OCRSettingsT.visionLangPref != langsAppleVisionElement.value) 
+        langsAppleVisionUpdated();
     getLangs = { 
         langs: OCRSettingsT.langs.replace(/(?:\s)/g, '').split(";").filter(item => item!=""), 
         langsPaddle: OCRSettingsT.langsPaddle.replace(/(?:\s)/g, '').split(";").filter(item => item!="")
     };
     OCRSettingsT.langs = getLangs.langs.join(";") + ";";
     OCRSettingsT.langsPaddle = getLangs.langsPaddle.join(";") + ";";
+    OCRSettingsT.visionLangPref = OCRSettingsT.visionLangPref.replace(/(?:\r\n|\r|\n|\t)/g, '').replace(/(?:\s\s+)/g, '').
+                trim().replace(/;;+/g, ';');
     copySettings(OCRSettingsT, OCRSettings);
     window.OCR.saveSettings(OCRSettings);
     enableTesseractOCR = OCRSettings.enableTesseractOCR;
     enablePaddleOCR = OCRSettings.enablePaddleOCR;
+    enableAplleVisionOCR = OCRSettings.enableAplleVisionOCR;
     langsElement.value = OCRSettings.langs;
     langsPaddleElement.value = OCRSettings.langsPaddle;
+    langsAppleVisionElement.value = OCRSettings.visionLangPref;
     loadLangOptions();
     showMessage("Settings saved.");
 }
@@ -917,29 +978,38 @@ async function initElectron() {
     settingsSH.addEventListener("click", settingsShowHide);
     langsElement.addEventListener("contextmenu", window.electronAPI.showContextMenu2);
     langsPaddleElement.addEventListener("contextmenu", window.electronAPI.showContextMenu2);
+    langsAppleVisionElement.addEventListener("contextmenu", window.electronAPI.showContextMenu2);
     // reading settings from backend
-    var os = await window.electronAPI.os();
+    os = await window.electronAPI.os();
     OCRSettings = await window.OCR.initSettings();
     // for MacOS only quit app when no open window?
     if(os == "darwin") {
         if(OCRSettings.isQuitNoWindow) window.electronAPI.setQuitNoWindow(true);
         quitNoWindow.style.display = "block";
+        ocrmacWrapper.style.display = "block";
+        langsAplleVisionElementWrapper.style.display = "block";
     }
     enableTesseractOCR = OCRSettings.enableTesseractOCR;
     enablePaddleOCR = OCRSettings.enablePaddleOCR;
+    enableAplleVisionOCR = OCRSettings.enableAplleVisionOCR;
     getLangs = { langs: OCRSettings.langs, langsPaddle: OCRSettings.langsPaddle };
     enableTesseractOCRElement.checked = OCRSettings.enableTesseractOCR;
     enablePaddleOCRElement.checked = OCRSettings.enablePaddleOCR;
+    enableAplleVisionOCRElement.checked = OCRSettings.enableAplleVisionOCR;
     OCRSettings.langs = OCRSettings.langs.join(";") + ";";
     OCRSettings.langsPaddle = OCRSettings.langsPaddle.join(";") + ";";
     OCRSettingsT = {
         enableTesseractOCR: OCRSettings.enableTesseractOCR,
         enablePaddleOCR: OCRSettings.enablePaddleOCR,
+        enableAplleVisionOCR: OCRSettings.enableAplleVisionOCR,
         langs: OCRSettings.langs,
         langsPaddle: OCRSettings.langsPaddle,
         tesseractPath: OCRSettings.tesseractPath,
         tessdatadir: OCRSettings.tessdatadir,
         python3Path: OCRSettings.python3Path,
+        python3PathOcrmac: OCRSettings.python3PathOcrmac,
+        visionLangPref: OCRSettings.visionLangPref,
+        visionFramework: OCRSettings.visionFramework,
         isQuitNoWindow: OCRSettings.isQuitNoWindow
     };
     displaySettings(OCRSettingsT);
@@ -1005,6 +1075,14 @@ async function loadLangOptions() {
             paddleOcrMultiline.style.display = "block";
         }
     }
+    // Apple vision OCR
+    if(isElectron() && os == "darwin" && enableAplleVisionOCR) {
+        var option = document.createElement("option");
+        option.value = "AppleVisionOCR";
+        option.innerText = "Apple vision OCR";
+        ocrSelect.append(option);
+        recognizeButton.style.display = "block";
+    }
     if(ocrSelect.length > 0) ocrSelect.value = ocrSelect[0].value;
 }
 
@@ -1021,10 +1099,14 @@ export {
     recognizeText,
     enableTesseractOCRChanged,
     enablePaddleOCRChanged,
+    enableAppleVisionOCRChanged,
     langsUpdated,
     langsPaddleUpdated,
+    langsAppleVisionUpdated,
+    visionFrameworkUpdated,
     langsHelpMessage,
     langsPaddleHelpMessage,
+    appleVisionLangPrefsHelpMessage,
     chosePath,
     clearPath,
     isQuitNoWindowYN,

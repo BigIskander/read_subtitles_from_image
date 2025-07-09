@@ -128,6 +128,12 @@ body {
 #settings_set em {
     font-weight: bold;
 }
+#langs_aplle_vision_element_wrapper {
+    display: none;
+}
+#ocrmac_wrapper {
+    display: none;
+}
 #quitNoWindow {
     display: none;
 }

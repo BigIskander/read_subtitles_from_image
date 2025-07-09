@@ -112,25 +112,73 @@ async function recognizePaddleOcr(imageBuffer, lang, multiline) {
     return result;
 }
 
+// recognize text using Apple vision
+async function recognizeAppleVision(
+    imageBuffer
+) {
+    // run Apple vision
+    var python3 = python3PathOcrmac ? python3PathOcrmac : "python3";
+    if(process.env.DEV == 'true')
+        var script = path.join(__dirname, "run_apple_vision.py");
+    else
+        var script = path.join(__dirname, "..", "run_apple_vision.py");
+    var commandArgs = [script, visionFramework, visionLangPref];
+    var visionProcess = childProcess.spawn(python3, commandArgs);
+    // get results
+    var output = "";
+    var error = "";
+    var result = await new Promise(async (resolve) => {
+        // @ts-ignore
+        visionProcess.on('error', (err) => { resolve({ err: err.toString(), data: "" }); });
+        // @ts-ignore
+        visionProcess.on('close', (code) => { 
+            if(code == 0) {
+                if(output.length > 0) output = output.slice(0, -1);
+                resolve({ err: "", data: output });
+            } else {
+                resolve({ err: "Apple vision, python3 script closed with status: " + 
+                    code + "\n" + error, data: "" });
+            } 
+        });
+        // @ts-ignore
+        visionProcess.stdout.on('data', function (data) {
+            output = output + data.toString() + "\n";
+        });
+        // @ts-ignore
+        visionProcess.stderr.on('data', (err) => {
+            resolve({ err: err.toString(), data: "" });
+        });
+        visionProcess.stdin.write(imageBuffer);
+        visionProcess.stdin.end();
+    });
+    return result;
+}
+
 var enableTesseractOCR = true;
 var enablePaddleOCR = true;
+var enableAplleVisionOCR = true;
 var langs = ["chi_all", "eng"];
 var langsPaddle = ["ch", "en", "chinese_cht"];
 // var language = "chi_all";
 var tessdatadir = null;
 var tesseractPath = null;
 var python3Path = null;
+var python3PathOcrmac = null;
+var visionFramework = "VisionKit";
+var visionLangPref = "zh-Hans;en-US;";
 var isQuitNoWindow = false;
 
 // tesseract OCR
 contextBridge.exposeInMainWorld('OCR', {
-    recognize: async (usePaddleOcr, imageDataUrl, lang, psmValue, multiline) => {
+    recognize: async (ocrEngine, imageDataUrl, lang, psmValue, multiline) => {
         var imageBuffer = Buffer.from(imageDataUrl.split('base64,')[1], 'base64');
         // get results
-        if(usePaddleOcr) {
+        if(ocrEngine == "PaddleOCR") {
             var lang = langsPaddle.includes(lang) ? lang : "ch";
             var multiline = Boolean(multiline);
             var result = await recognizePaddleOcr(imageBuffer, lang, multiline);
+        } else if(ocrEngine == "AppleVisionOCR") {
+            var result = await recognizeAppleVision(imageBuffer);
         } else {
             var lang = langs.includes(lang) ? lang : "chi_all";
             var psmValue = parseInt(psmValue);
@@ -149,6 +197,8 @@ contextBridge.exposeInMainWorld('OCR', {
                 settings.enableTesseractOCR : enableTesseractOCR;
             enablePaddleOCR = settings.enablePaddleOCR != undefined ?
                 settings.enablePaddleOCR : enablePaddleOCR; 
+            enableAplleVisionOCR = settings.enableAplleVisionOCR != undefined ?
+                settings.enableAplleVisionOCR : enableAplleVisionOCR;
             langs = settings.langs ? settings.langs : settings.language ?
                 [settings.language] : langs;
             langsPaddle = settings.langsPaddle ? settings.langsPaddle : langsPaddle;
@@ -157,28 +207,42 @@ contextBridge.exposeInMainWorld('OCR', {
                 settings.tesseractPath : tesseractPath;
             python3Path = settings.python3Path ?
                 settings.python3Path : python3Path;
+            python3PathOcrmac = settings.python3PathOcrmac ?
+                settings.python3PathOcrmac : python3PathOcrmac;
+            visionFramework = settings.visionFramework ?
+                settings.visionFramework : visionFramework;
+            visionLangPref = settings.visionLangPref ?
+                settings.visionLangPref : visionLangPref;
             isQuitNoWindow = settings.isQuitNoWindow != undefined ?
                 settings.isQuitNoWindow : isQuitNoWindow;
             // return settings
             return { 
                 enableTesseractOCR: enableTesseractOCR,
                 enablePaddleOCR: enablePaddleOCR,
+                enableAplleVisionOCR: enableAplleVisionOCR,
                 langs: langs,
                 langsPaddle: langsPaddle,
                 tesseractPath: tesseractPath, 
                 tessdatadir: tessdatadir, 
                 python3Path: python3Path,
+                python3PathOcrmac: python3PathOcrmac,
+                visionFramework: visionFramework,
+                visionLangPref: visionLangPref,
                 isQuitNoWindow: isQuitNoWindow
             }; 
         } else {
             return { 
                 enableTesseractOCR: enableTesseractOCR,
                 enablePaddleOCR: enablePaddleOCR,
+                enableAplleVisionOCR: enableAplleVisionOCR,
                 langs: langs,
                 langsPaddle: langsPaddle,
                 tesseractPath: tesseractPath, 
                 tessdatadir: tessdatadir, 
                 python3Path: python3Path,
+                python3PathOcrmac: python3PathOcrmac,
+                visionFramework: visionFramework,
+                visionLangPref: visionLangPref,
                 isQuitNoWindow: isQuitNoWindow
             }; 
         }
@@ -191,11 +255,17 @@ contextBridge.exposeInMainWorld('OCR', {
             split(";").filter(item => item!="");
         enableTesseractOCR = settings.enableTesseractOCR;
         enablePaddleOCR = settings.enablePaddleOCR;  
+        enableAplleVisionOCR = settings.enableAplleVisionOCR;
         langs = settings.langs;
         langsPaddle = settings.langsPaddle;
         tessdatadir = settings.tessdatadir;
         tesseractPath = settings.tesseractPath;
         python3Path = settings.python3Path;
+        python3PathOcrmac = settings.python3PathOcrmac;
+        visionFramework = settings.visionFramework;
+        visionLangPref = settings.visionLangPref.
+            replace(/(?:\r\n|\r|\n|\t)/g, '').replace(/(?:\s\s+)/g, '').
+            trim().replace(/;;+/g, ';');
         isQuitNoWindow = settings.isQuitNoWindow;
         storage.setItem("settings", settings);
         if(process.platform === "darwin")
