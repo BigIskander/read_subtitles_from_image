@@ -4,13 +4,13 @@
 
 This is the program made to recognize text (subtitles) in case when they are part of an image. 
 
-This is the instruction for version 1.1, instruction for version 1.0 is located in v1.0 branch of this repository.
+This is the instruction for versions 1.1 - 1.2, instruction for version 1.0 is located in v1.0 branch of this repository.
 
 This program is created to recognize text from an image, so then unknown words can easily be searched and found in a dictionary.
 
 I wrote this program with the purpose of learning chinese language, for that reason the default settings is set up to recognize text in chinese language.
 
-From technical point of view this program works as frontend (as GUI or graphical shell) to OCR (Optical Character Recognition) program. This program cuts selected part of an image with text in it, processes the image depending on settings and then sends it to OCR program to recognize text, then displays the result. At the moment programm support 2 OCR engines: Tesseract OCR and PaddleOCR.
+From technical point of view this program works as frontend (as GUI or graphical shell) to OCR (Optical Character Recognition) program. This program cuts selected part of an image with text in it, processes the image depending on settings and then sends it to OCR program to recognize text, then displays the result. At the moment programm support 3 OCR engines: Tesseract OCR, PaddleOCR and ocrmac (only in version for MacOS).
 
 ## How to use the programm
 
@@ -30,7 +30,7 @@ You can find compiled binaries (installation files) with program in [releases](h
 
 The program is available for operating systems Linux, Windows and macOS.
 
-In order for program to work you also need to install [Tesseract OCR](https://tesseract-ocr.github.io/) and/or [PaddleOCR](https://paddlepaddle.github.io/PaddleOCR/main/en/index.html).
+In order for program to work you also need to install [Tesseract OCR](https://tesseract-ocr.github.io/) and/or [PaddleOCR](https://paddlepaddle.github.io/PaddleOCR/main/en/index.html) and/or [ocrmac](https://github.com/straussmaximilian/ocrmac) (oly in version for MacOS).
 
 There is also [version of the program working in docker](https://hub.docker.com/r/bigiskander/read_subtitles_from_image). In this version everything necessary for program to work is already set up and included in the image of [docker](https://www.docker.com/) container.
 
@@ -68,6 +68,16 @@ By default language is set up as chi_all, .traineddata file for which, can be do
     which python
     ```
 4. in program settings set the list of languages uset to recognize text. Names of the languages are separated by semicolon (;), names of the languages corresponds to abbreviations from [the table of supported languages](https://paddlepaddle.github.io/PaddleOCR/main/en/ppocr/blog/multi_languages.html#5-support-languages-and-abbreviations).
+
+## In case of using with ocrmac
+1. Install ocrmac Python package:
+    ```
+    pip3 install ocrmac
+    ```
+2. If ocrmac is installed in build in version of Python you can skip this step. If ocrmac is installed in standalone version of Python then in program settings choose the path of **python** file.
+3. In program settings set list of preferred languages (language codes) and choose type of vision framework (VisionKit or LiveText).
+
+**Note:** This methon only works in version for MacOS.
 
 ## For developers
 
