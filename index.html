@@ -122,7 +122,7 @@
       <div id="settings_set" style="margin-top: 10px;">
         <div>Use Tesseract OCR: <input id="enable_Tesseract_OCR" type="checkbox" onchange="enableTesseractOCRChanged()" checked></div>
         <div>Use PaddleOCR: <input id="enable_Paddle_OCR" type="checkbox" onchange="enablePaddleOCRChanged()" checked></div>
-        <div>Use Apple vision OCR: <input id="enable_AppleVision_OCR" type="checkbox" onchange="enableAppleVisionOCRChanged()" checked></div>
+        <div id="apple_vision_enabler">Use Apple vision OCR: <input id="enable_AppleVision_OCR" type="checkbox" onchange="enableAppleVisionOCRChanged()" checked></div>
         <div>Tesseract languages: 
           <input id="langs_element" type="text" maxlength="50" value="chi_all;eng;" onchange="langsUpdated()">
           (<a href="JavaScript:void(0);" onclick="langsHelpMessage()">?</a>)

@@ -110,6 +110,7 @@ var settingsSet = document.querySelector("#settings_set");
 var settingsSH = document.querySelector("#settings_show_hide");
 var enableTesseractOCRElement = document.querySelector("#enable_Tesseract_OCR");
 var enablePaddleOCRElement = document.querySelector("#enable_Paddle_OCR");
+var appleVisionEnabler = document.querySelector("#apple_vision_enabler");
 var enableAplleVisionOCRElement = document.querySelector("#enable_AppleVision_OCR");
 var langsElement = document.querySelector("#langs_element");
 var langsPaddleElement = document.querySelector("#langs_paddle_element");
@@ -986,6 +987,7 @@ async function initElectron() {
     if(os == "darwin") {
         if(OCRSettings.isQuitNoWindow) window.electronAPI.setQuitNoWindow(true);
         quitNoWindow.style.display = "block";
+        appleVisionEnabler.style.display = "block";
         ocrmacWrapper.style.display = "block";
         langsAplleVisionElementWrapper.style.display = "block";
     }
