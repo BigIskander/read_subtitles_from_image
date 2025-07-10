@@ -77,7 +77,7 @@ By default language is set up as chi_all, .traineddata file for which, can be do
 2. If ocrmac is installed in build in version of Python you can skip this step. If ocrmac is installed in standalone version of Python then in program settings choose the path of **python** file.
 3. In program settings set list of preferred languages (language codes) and choose type of vision framework (VisionKit or LiveText).
 
-**Note:** This methon only works in version for MacOS.
+**Note:** This method only works in version for MacOS.
 
 ## For developers
 
