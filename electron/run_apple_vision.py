@@ -46,8 +46,10 @@ for line in result:
             if framework != "VisionKit":
                 if not ((line[2][0] + line[2][2]) < prev[2][0] or (prev[2][0] + prev[2][2]) < line[2][0]):
                     output = output + line[0]
-                else:
+                elif not ((line[2][0] + line[2][2]) < (0.75 * prev[2][0]) or (prev[2][0] + prev[2][2]) < (0.75 * line[2][0])):
                     output = output + " " + line[0]
+                else:
+                    output = output + "\t" + line[0]
             else:
                 output = output + "\t" + line[0]
         else:
