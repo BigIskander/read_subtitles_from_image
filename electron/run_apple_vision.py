@@ -19,6 +19,8 @@ img_pil = Image.open(img_bytes2)
 # is positions or text results one line or not
 #  x, y, w, h
 def is_visionocr_result_positions_inline(bbox1, bbox2):
+    # print("bbox1=" + str(bbox1))
+    # print("bbox2=" + str(bbox2))
     return not (bbox1[2][1] > (bbox2[2][1] + bbox2[2][3]) or (bbox1[2][1] + bbox1[2][3]) < bbox2[2][1])
 
 # compare paddle ocr results to sort them
@@ -41,7 +43,13 @@ prev = None
 for line in result:    
     if prev != None:
         if is_visionocr_result_positions_inline(line, prev):
-            output = output + "\t" + line[0]
+            if framework != "VisionKit":
+                if not ((line[2][0] + line[2][2]) < prev[2][0] or (prev[2][0] + prev[2][2]) < line[2][0]):
+                    output = output + line[0]
+                else:
+                    output = output + " " + line[0]
+            else:
+                output = output + "\t" + line[0]
         else:
             print(output)
             output = line[0]
