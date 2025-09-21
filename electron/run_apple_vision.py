@@ -43,10 +43,11 @@ prev = None
 for line in result:    
     if prev != None:
         if is_visionocr_result_positions_inline(line, prev):
+            # print("line=" + line[0])
             if framework != "VisionKit":
                 if not ((line[2][0] + line[2][2]) < prev[2][0] or (prev[2][0] + prev[2][2]) < line[2][0]):
                     output = output + line[0]
-                elif not ((line[2][0] + line[2][2]) < (0.75 * prev[2][0]) or (prev[2][0] + prev[2][2]) < (0.75 * line[2][0])):
+                elif not ((line[2][0] + line[2][2]) < (prev[2][0] - prev[2][3] * 0.75) or (prev[2][0] + prev[2][2]) < (line[2][0] - line[2][3] * 0.75)):
                     output = output + " " + line[0]
                 else:
                     output = output + "\t" + line[0]
